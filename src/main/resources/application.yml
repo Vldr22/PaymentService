@@ -27,10 +27,9 @@ spring:
 server:
   port: 8585
 
-yookassa:
-  shop-id: ${YOOKASSA_SHOP_ID}
-  secret-key: ${YOOKASSA_SECRET_KEY}
-
+stripe:
+  secret-key: ${STRIPE.SECRET.KEY}
+  publishable-key: ${STRIPE.PUBLISHABLE.KEY}
 jwt:
-  secret: ${JWT_SECRET}
+  secret: ${JWT.SECRET}
   expiration-seconds: 86400

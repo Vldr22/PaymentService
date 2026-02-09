@@ -8,21 +8,20 @@ import lombok.Setter;
 import org.resume.paymentservice.model.enums.SubscriptionType;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Entity
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "subscription")
+@Table(name = "subscriptions")
 public class Subscription {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(length = 50, nullable = false)
     private SubscriptionType subscriptionType;
 
     @Column(nullable = false)
@@ -50,11 +49,11 @@ public class Subscription {
         updatedAt = LocalDateTime.now();
     }
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "last_payment_id")
     private Payment lastPayment;
 
