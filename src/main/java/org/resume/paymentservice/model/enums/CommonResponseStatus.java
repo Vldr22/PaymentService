@@ -1,6 +1,6 @@
 package org.resume.paymentservice.model.enums;
 
-public enum ResponseStatus {
+public enum CommonResponseStatus {
     SUCCESS,
     ERROR,
 }
