@@ -5,13 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.resume.paymentservice.model.enums.Currency;
 import org.resume.paymentservice.model.enums.RefundStatus;
-import org.resume.paymentservice.utils.BigDecimalToLongConverter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Entity
 @Getter @Setter
@@ -21,25 +18,20 @@ import java.util.UUID;
 public class Refund {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Column(unique = true)
-    private String yookassaRefundId;
+    @Column(length = 100, nullable = false, unique = true)
+    private String stripeRefundId;
 
-    @Convert(converter = BigDecimalToLongConverter.class)
-    @Column(nullable = false)
+    @Column(nullable = false, precision = 15, scale = 2)
     private BigDecimal amount;
 
-    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private Currency currency;
-
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
+    @Column(length = 50, nullable = false)
     private RefundStatus status;
 
-    @Column(length = 500)
+    @Column(length = 255)
     private String reason;
 
     @Column(nullable = false, updatable = false)
@@ -58,7 +50,7 @@ public class Refund {
         updatedAt = LocalDateTime.now();
     }
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "payment_id", nullable = false)
     private Payment payment;
 

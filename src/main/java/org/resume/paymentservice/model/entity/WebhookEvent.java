@@ -1,5 +1,7 @@
 package org.resume.paymentservice.model.entity;
 
+
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,28 +9,26 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "webhook_events")
+@Table(name = "webhook_events", indexes = {
+        @Index(name = "idx.event_id", columnList = "eventId")
+})
 public class WebhookEvent {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, length = 100)
     private String eventId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 50)
     private String eventType;
-
-    @Column(nullable = false)
-    private UUID paymentId;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String payload;
@@ -41,6 +41,10 @@ public class WebhookEvent {
 
     @Column
     private LocalDateTime processedAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "payment_id", nullable = false)
+    private Payment payment;
 
     @PrePersist
     protected void onCreate() {
