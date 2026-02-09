@@ -1,0 +1,60 @@
+package org.resume.paymentservice.service;
+
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.resume.paymentservice.exception.PaymentNotFoundException;
+import org.resume.paymentservice.model.dto.PaymentCreationData;
+import org.resume.paymentservice.model.entity.Payment;
+import org.resume.paymentservice.model.entity.User;
+import org.resume.paymentservice.model.enums.PaymentStatus;
+import org.resume.paymentservice.repository.PaymentRepository;
+import org.springframework.stereotype.Service;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class PaymentService {
+
+    private final PaymentRepository paymentRepository;
+    private final UserService userService;
+
+    public Payment savePayment(PaymentCreationData data) {
+        User user = userService.getUserById(data.getUserId());
+
+        Payment payment = new Payment(
+                data.getStripePaymentIntentId(),
+                data.getAmount(),
+                data.getCurrency(),
+                PaymentStatus.PENDING,
+                data.getDescription(),
+                data.getClientSecret(),
+                user,
+                null // TODO: implement saved card support
+        );
+
+        Payment savedPayment = paymentRepository.save(payment);
+
+        log.info("Payment saved to database: id={}, stripePaymentIntentId={}, userId={}, amount={}, currency={}",
+                savedPayment.getId(), savedPayment.getStripePaymentIntentId(),
+                data.getUserId(), data.getAmount(), data.getCurrency());
+
+        return savedPayment;
+    }
+
+    @Transactional
+    public void updatePaymentStatus(String stripePaymentIntentId, PaymentStatus newStatus) {
+        Payment payment = findByStripePaymentIntentId(stripePaymentIntentId);
+        payment.setStatus(newStatus);
+        paymentRepository.save(payment);
+
+        log.info("Payment status updated in database: paymentId={}, stripePaymentIntentId={}, oldStatus={}, newStatus={}",
+                payment.getId(), stripePaymentIntentId, payment.getStatus(), newStatus);
+    }
+
+    public Payment findByStripePaymentIntentId(String stripePaymentIntentId) {
+        return paymentRepository.findByStripePaymentIntentId(stripePaymentIntentId)
+                .orElseThrow(() -> PaymentNotFoundException.byStripeId(stripePaymentIntentId));
+    }
+
+}
