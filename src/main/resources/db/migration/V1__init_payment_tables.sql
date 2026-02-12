@@ -63,7 +63,7 @@ CREATE TABLE payments
     CONSTRAINT fk_payments_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
     CONSTRAINT fk_payments_card_token FOREIGN KEY (card_token_id) REFERENCES card_tokens (id) ON DELETE SET NULL,
     CONSTRAINT chk_payment_status CHECK (status IN
-                                         ('PENDING', 'PROCESSING', 'SUCCEEDED', 'FAILED', 'CANCELED', 'REFUNDED'))
+                                         ('PENDING', 'PROCESSING', 'SUCCEEDED', 'FAILED', 'CANCELED'))
 );
 
 CREATE INDEX idx_payments_stripe_payment_intent_id ON payments (stripe_payment_intent_id);
@@ -82,7 +82,7 @@ CREATE TABLE subscriptions
     updated_at        TIMESTAMP,
     CONSTRAINT fk_subscriptions_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
     CONSTRAINT fk_subscriptions_last_payment FOREIGN KEY (last_payment_id) REFERENCES payments (id) ON DELETE SET NULL,
-    CONSTRAINT chk_subscription_type CHECK (subscription_type IN ('BASIC', 'PREMIUM', 'ENTERPRISE'))
+    CONSTRAINT chk_subscription_type CHECK (subscription_type IN ('DEFAULT'))
 );
 
 CREATE TABLE webhook_events
@@ -92,10 +92,8 @@ CREATE TABLE webhook_events
     event_type   VARCHAR(50)  NOT NULL,
     payload      TEXT         NOT NULL,
     processed    BOOLEAN      NOT NULL DEFAULT FALSE,
-    payment_id   BIGINT       NOT NULL,
     created_at   TIMESTAMP    NOT NULL,
-    processed_at TIMESTAMP,
-    CONSTRAINT fk_webhook_events_payment FOREIGN KEY (payment_id) REFERENCES payments (id) ON DELETE CASCADE
+    processed_at TIMESTAMP
 );
 
 CREATE INDEX idx_webhook_events_event_id ON webhook_events (event_id);
