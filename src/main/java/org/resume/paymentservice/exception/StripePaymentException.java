@@ -28,4 +28,12 @@ public class StripePaymentException extends RuntimeException {
                 cause
         );
     }
+
+    public static StripePaymentException byConfirmedError(String stripeMessage, Throwable cause) {
+        return new StripePaymentException(
+                String.format("%s%s", ErrorMessages.STRIPE_PAYMENT_CONFIRMED_FAILED, stripeMessage),
+                stripeMessage,
+                cause
+        );
+    }
 }
