@@ -10,4 +10,12 @@ public class PaymentServiceApplication {
         SpringApplication.run(PaymentServiceApplication.class, args);
     }
 
+    /*
+    stripe listen --forward-to localhost:8080/api/webhooks/stripe
+
+    pm_card_visa
+    pm_card_chargeDeclined
+
+     */
+
 }

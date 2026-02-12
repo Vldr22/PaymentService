@@ -2,7 +2,9 @@ package org.resume.paymentservice.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.resume.paymentservice.exception.StripePaymentException;
 import org.resume.paymentservice.model.dto.PaymentCreationData;
+import org.resume.paymentservice.model.dto.request.ConfirmPaymentRequest;
 import org.resume.paymentservice.model.dto.request.CreatePaymentRequest;
 import org.resume.paymentservice.model.dto.response.PaymentResponse;
 import org.resume.paymentservice.model.entity.Payment;
@@ -27,6 +29,25 @@ public class PaymentFacadeService {
                 userId, stripeResponse.getId());
 
         return stripeResponse;
+    }
+
+    public PaymentResponse confirmPayment(String paymentIntentId, ConfirmPaymentRequest request) {
+        try {
+            PaymentResponse response = stripeService.confirmPayment(
+                    paymentIntentId, request.paymentMethod(), request.returnUrl()
+            );
+
+            PaymentStatus newStatus = mapStripeStatus(response.getStatus());
+            paymentService.updatePaymentStatus(paymentIntentId, newStatus);
+
+            log.info("Payment confirmed: paymentIntentId={}, status={}", paymentIntentId, newStatus);
+            return response;
+
+        } catch (StripePaymentException e) {
+            paymentService.updatePaymentStatus(paymentIntentId, PaymentStatus.FAILED);
+            log.warn("Payment confirmation failed, marked as FAILED: paymentIntentId={}", paymentIntentId);
+            throw e;
+        }
     }
 
     public PaymentResponse getPaymentStatus(String paymentIntentId) {

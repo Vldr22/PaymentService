@@ -2,6 +2,7 @@ package org.resume.paymentservice.service;
 
 import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
+import com.stripe.param.PaymentIntentConfirmParams;
 import com.stripe.param.PaymentIntentCreateParams;
 import lombok.extern.slf4j.Slf4j;
 import org.resume.paymentservice.exception.StripePaymentException;
@@ -46,6 +47,26 @@ public class StripeService {
         }
     }
 
+    public PaymentResponse confirmPayment(String paymentIntentId, String paymentMethod, String returnUrl) {
+        try {
+            PaymentIntent paymentIntent = PaymentIntent.retrieve(paymentIntentId);
+
+             PaymentIntentConfirmParams params = PaymentIntentConfirmParams.builder()
+                    .setPaymentMethod(paymentMethod)
+                    .setReturnUrl(returnUrl)
+                    .build();
+
+            PaymentIntent confirmed = paymentIntent.confirm(params);
+
+            log.info("Payment confirmed: id={}, status={}", confirmed.getId(), confirmed.getStatus());
+            return toPaymentResponse(confirmed);
+
+        } catch (StripeException e) {
+            log.error("Payment confirmation failed: {}", e.getMessage(), e);
+            throw StripePaymentException.byConfirmedError(e.getMessage(), e);
+        }
+    }
+
     public PaymentResponse getPaymentStatus(String paymentIntentId) {
         try {
             PaymentIntent paymentIntent = PaymentIntent.retrieve(paymentIntentId);
@@ -57,7 +78,7 @@ public class StripeService {
 
         } catch (StripeException e) {
             log.error("Failed to retrieve Stripe payment status: {}", e.getMessage(), e);
-            throw StripePaymentException.byCreationError(e.getMessage(), e);
+            throw StripePaymentException.byStatusError(e.getMessage(), e);
         }
     }
 

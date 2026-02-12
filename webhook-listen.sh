@@ -1,0 +1,3 @@
+#!/bin/bash
+## Запустить stripe listen
+stripe listen --forward-to localhost:8080/api/webhooks/stripe
