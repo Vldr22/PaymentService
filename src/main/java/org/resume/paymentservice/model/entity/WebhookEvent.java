@@ -42,12 +42,16 @@ public class WebhookEvent {
     @Column
     private LocalDateTime processedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "payment_id", nullable = false)
-    private Payment payment;
-
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
+    }
+
+    public WebhookEvent(String eventId, String eventType,
+                        boolean processed, String payload) {
+        this.eventId = eventId;
+        this.eventType = eventType;
+        this.processed = processed;
+        this.payload = payload;
     }
 }

@@ -15,5 +15,9 @@ public class StripeProperties {
     @NotBlank(message = "Stripe secret-key can't be empty")
     private final String secretKey;
 
+    @NotBlank(message = "Stripe publish-key can't be empty")
     private final String publishableKey;
+
+    @NotBlank(message = "Webhook secret-key can't be empty")
+    private final String webhookSecret;
 }
