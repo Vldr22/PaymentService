@@ -3,7 +3,7 @@ package org.resume.paymentservice.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.resume.paymentservice.exception.PaymentNotFoundException;
+import org.resume.paymentservice.exception.NotFoundException;
 import org.resume.paymentservice.model.dto.PaymentCreationData;
 import org.resume.paymentservice.model.entity.Payment;
 import org.resume.paymentservice.model.entity.User;
@@ -33,28 +33,22 @@ public class PaymentService {
                 null // TODO: implement saved card support
         );
 
-        Payment savedPayment = paymentRepository.save(payment);
-
-        log.info("Payment saved to database: id={}, stripePaymentIntentId={}, userId={}, amount={}, currency={}",
-                savedPayment.getId(), savedPayment.getStripePaymentIntentId(),
-                data.getUserId(), data.getAmount(), data.getCurrency());
-
-        return savedPayment;
+        return paymentRepository.save(payment);
     }
 
     @Transactional
     public void updatePaymentStatus(String stripePaymentIntentId, PaymentStatus newStatus) {
         Payment payment = findByStripePaymentIntentId(stripePaymentIntentId);
+        PaymentStatus oldStatus = payment.getStatus();
         payment.setStatus(newStatus);
         paymentRepository.save(payment);
 
-        log.info("Payment status updated in database: paymentId={}, stripePaymentIntentId={}, oldStatus={}, newStatus={}",
-                payment.getId(), stripePaymentIntentId, payment.getStatus(), newStatus);
+        log.info("Payment status updated: stripeId={}, {} -> {}", stripePaymentIntentId, oldStatus, newStatus);
     }
 
     public Payment findByStripePaymentIntentId(String stripePaymentIntentId) {
         return paymentRepository.findByStripePaymentIntentId(stripePaymentIntentId)
-                .orElseThrow(() -> PaymentNotFoundException.byStripeId(stripePaymentIntentId));
+                .orElseThrow(() -> NotFoundException.paymentByStripeId(stripePaymentIntentId));
     }
 
 }
