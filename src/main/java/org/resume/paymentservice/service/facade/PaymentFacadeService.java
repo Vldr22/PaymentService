@@ -1,4 +1,4 @@
-package org.resume.paymentservice.service;
+package org.resume.paymentservice.service.facade;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -8,8 +8,14 @@ import org.resume.paymentservice.model.dto.request.ConfirmPaymentRequest;
 import org.resume.paymentservice.model.dto.request.CreatePaymentRequest;
 import org.resume.paymentservice.model.dto.response.PaymentResponse;
 import org.resume.paymentservice.model.entity.Payment;
+import org.resume.paymentservice.model.entity.User;
 import org.resume.paymentservice.model.enums.PaymentStatus;
+import org.resume.paymentservice.service.payment.PaymentService;
+import org.resume.paymentservice.service.payment.StripeService;
+import org.resume.paymentservice.service.user.UserService;
 import org.springframework.stereotype.Service;
+
+import static org.resume.paymentservice.model.enums.PaymentStatus.mapStripeStatus;
 
 @Slf4j
 @Service
@@ -18,26 +24,30 @@ public class PaymentFacadeService {
 
     private final PaymentService paymentService;
     private final StripeService stripeService;
+    private final UserService userService;
 
-    public PaymentResponse createPayment(Long userId, CreatePaymentRequest request) {
+    public PaymentResponse createPayment(CreatePaymentRequest request) {
+        User user = userService.getCurrentUser();
         PaymentResponse stripeResponse = stripeService.createStripePayment(request);
 
-        PaymentCreationData data = buildPaymentCreationData(userId, request, stripeResponse);
+        PaymentCreationData data = buildPaymentCreationData(user.getId(), request, stripeResponse);
         paymentService.savePayment(data);
 
-        log.info("Payment created successfully: userId={}, stripePaymentIntentId={}",
-                userId, stripeResponse.getId());
+        log.info("Payment created: userId={}, stripePaymentIntentId={}",
+                user.getId(), stripeResponse.getId());
 
         return stripeResponse;
     }
 
     public PaymentResponse confirmPayment(String paymentIntentId, ConfirmPaymentRequest request) {
+        validatePaymentOwner(paymentIntentId);
+
         try {
             PaymentResponse response = stripeService.confirmPayment(
                     paymentIntentId, request.paymentMethod(), request.returnUrl()
             );
 
-            PaymentStatus newStatus = mapStripeStatus(response.getStatus());
+            PaymentStatus newStatus = PaymentStatus.mapStripeStatus(response.getStatus());
             paymentService.updatePaymentStatus(paymentIntentId, newStatus);
 
             log.info("Payment confirmed: paymentIntentId={}, status={}", paymentIntentId, newStatus);
@@ -51,6 +61,8 @@ public class PaymentFacadeService {
     }
 
     public PaymentResponse getPaymentStatus(String paymentIntentId) {
+        validatePaymentOwner(paymentIntentId);
+
         PaymentResponse stripeResponse = stripeService.getPaymentStatus(paymentIntentId);
 
         Payment payment = paymentService.findByStripePaymentIntentId(paymentIntentId);
@@ -63,6 +75,10 @@ public class PaymentFacadeService {
         return stripeResponse;
     }
 
+    private void validatePaymentOwner(String paymentIntentId) {
+        User currentUser = userService.getCurrentUser();
+        paymentService.findByStripePaymentIntentIdAndUser(paymentIntentId, currentUser);
+    }
 
     private PaymentCreationData buildPaymentCreationData(Long userId, CreatePaymentRequest request,
                                                          PaymentResponse stripeResponse) {
@@ -74,16 +90,6 @@ public class PaymentFacadeService {
                 .description(request.description())
                 .clientSecret(stripeResponse.getClientSecret())
                 .build();
-    }
-
-    private PaymentStatus mapStripeStatus(String stripeStatus) {
-        return switch (stripeStatus.toLowerCase()) {
-            case "requires_payment_method", "requires_confirmation", "requires_action" -> PaymentStatus.PENDING;
-            case "processing" -> PaymentStatus.PROCESSING;
-            case "succeeded" -> PaymentStatus.SUCCEEDED;
-            case "canceled" -> PaymentStatus.CANCELED;
-            default -> PaymentStatus.FAILED;
-        };
     }
 
 }

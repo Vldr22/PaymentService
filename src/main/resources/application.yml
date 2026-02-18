@@ -10,6 +10,11 @@ spring:
     username: postgres
     password: ${POSTGRES_PASSWORD}
 
+  data:
+    redis:
+      host: localhost
+      port: 6380
+
   jpa:
     hibernate:
       ddl-auto: none
@@ -32,8 +37,18 @@ stripe:
   publishable-key: ${STRIPE.PUBLISHABLE.KEY}
   webhook-secret: ${STRIPE.WEBHOOK.SECRET}
   webhook:
-    dev-mode: "false"
+    dev-mode: prod
 
 jwt:
-  secret: ${JWT.SECRET}
+  secret-key: ${JWT.TOKEN.SECRET.KEY}
   expiration-seconds: 86400
+  cookie-secure: false
+
+admin:
+  name: ${ADMIN.NAME}
+  midname: ${ADMIN.MIDNAME}
+  surname: ${ADMIN.SURNAME}
+  email: ${ADMIN.EMAIL}
+  password: ${ADMIN.PASSWORD}
+
+

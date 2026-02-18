@@ -1,4 +1,4 @@
-package org.resume.paymentservice.service;
+package org.resume.paymentservice.service.payment;
 
 import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;

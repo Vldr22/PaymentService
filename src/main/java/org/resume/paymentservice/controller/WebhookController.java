@@ -1,7 +1,7 @@
 package org.resume.paymentservice.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.resume.paymentservice.service.WebhookService;
+import org.resume.paymentservice.service.webhook.WebhookService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

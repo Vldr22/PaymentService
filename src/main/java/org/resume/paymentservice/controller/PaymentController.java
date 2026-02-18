@@ -6,7 +6,7 @@ import org.resume.paymentservice.model.dto.CommonResponse;
 import org.resume.paymentservice.model.dto.request.ConfirmPaymentRequest;
 import org.resume.paymentservice.model.dto.request.CreatePaymentRequest;
 import org.resume.paymentservice.model.dto.response.PaymentResponse;
-import org.resume.paymentservice.service.PaymentFacadeService;
+import org.resume.paymentservice.service.facade.PaymentFacadeService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,11 +18,10 @@ public class PaymentController {
 
     @PostMapping
     public CommonResponse<PaymentResponse> createPayment(
-            @RequestParam Long userId,
             @Valid @RequestBody CreatePaymentRequest createPaymentRequest
     ) {
 
-      PaymentResponse paymentResponse = paymentFacadeService.createPayment(userId, createPaymentRequest);
+      PaymentResponse paymentResponse = paymentFacadeService.createPayment(createPaymentRequest);
       return CommonResponse.success(paymentResponse);
     }
 
