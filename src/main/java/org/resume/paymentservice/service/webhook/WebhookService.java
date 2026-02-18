@@ -1,4 +1,4 @@
-package org.resume.paymentservice.service;
+package org.resume.paymentservice.service.webhook;
 
 
 import com.stripe.model.PaymentIntent;
@@ -9,7 +9,7 @@ import org.resume.paymentservice.exception.NotFoundException;
 import org.resume.paymentservice.exception.WebhookProcessingException;
 import org.resume.paymentservice.model.entity.WebhookEvent;
 import org.resume.paymentservice.repository.WebhookEventRepository;
-import org.resume.paymentservice.service.webhook.WebhookSignatureVerifier;
+import org.resume.paymentservice.service.payment.PaymentEventHandler;
 import org.resume.paymentservice.utils.ErrorMessages;
 import org.resume.paymentservice.utils.StripeEventTypes;
 import org.springframework.stereotype.Service;
@@ -32,7 +32,7 @@ public class WebhookService {
         checkDuplicate(event.getId());
 
         if (!SUPPORTED_EVENT_TYPES.contains(event.getType())) {
-            log.info("Ignoring unsupported event type: {}", event.getType());
+            log.warn("Ignoring unsupported event type: {}", event.getType());
             return;
         }
 

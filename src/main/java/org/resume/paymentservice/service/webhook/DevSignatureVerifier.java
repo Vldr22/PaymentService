@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-@ConditionalOnProperty(name = "stripe.webhook.dev-mode", havingValue = "true", matchIfMissing = false)
+@ConditionalOnProperty(name = "stripe.webhook.dev-mode", havingValue = "dev")
 public class DevSignatureVerifier implements WebhookSignatureVerifier {
 
     private static final String INVALID = "dev-invalid-signature";

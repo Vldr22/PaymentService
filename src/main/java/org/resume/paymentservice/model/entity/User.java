@@ -53,4 +53,21 @@ public class User {
         createdAt = LocalDateTime.now();
     }
 
+    public User(String name, String surname, String midname, String phone) {
+        this.name = name;
+        this.surname = surname;
+        this.midname = midname;
+        this.phone = phone;
+        this.role = Roles.ROLE_USER;
+    }
+
+    public User(String name, String surname, String midname, String email, String password, Roles role) {
+        this.name = name;
+        this.surname = surname;
+        this.midname = midname;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+    }
+
 }

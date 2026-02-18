@@ -8,7 +8,7 @@ public class WebhookProcessingException extends RuntimeException {
 
     private final String eventId;
 
-    public WebhookProcessingException(String message, String eventId) {
+    private WebhookProcessingException(String message, String eventId) {
         super(message);
         this.eventId = eventId;
     }

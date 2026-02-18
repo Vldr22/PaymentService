@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-@ConditionalOnProperty(name = "stripe.webhook.dev-mode", havingValue = "false", matchIfMissing = true)
+@ConditionalOnProperty(name = "stripe.webhook.dev-mode", havingValue = "prod", matchIfMissing = true)
 public class ProdSignatureVerifier implements WebhookSignatureVerifier {
 
     private static final String UNKNOWN = "unknown";

@@ -1,4 +1,4 @@
-package org.resume.paymentservice.service;
+package org.resume.paymentservice.service.payment;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +9,9 @@ import org.resume.paymentservice.model.entity.Payment;
 import org.resume.paymentservice.model.entity.User;
 import org.resume.paymentservice.model.enums.PaymentStatus;
 import org.resume.paymentservice.repository.PaymentRepository;
+import org.resume.paymentservice.service.user.UserService;
+import org.resume.paymentservice.utils.ErrorMessages;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -49,6 +52,14 @@ public class PaymentService {
     public Payment findByStripePaymentIntentId(String stripePaymentIntentId) {
         return paymentRepository.findByStripePaymentIntentId(stripePaymentIntentId)
                 .orElseThrow(() -> NotFoundException.paymentByStripeId(stripePaymentIntentId));
+    }
+
+    public void findByStripePaymentIntentIdAndUser(String stripePaymentIntentId, User user) {
+        Payment payment = findByStripePaymentIntentId(stripePaymentIntentId);
+
+        if (!payment.getUser().getId().equals(user.getId())) {
+            throw new AccessDeniedException(ErrorMessages.PAYMENT_ACCESS_DENIED);
+        }
     }
 
 }
