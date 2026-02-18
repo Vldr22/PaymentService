@@ -9,6 +9,9 @@ public class ErrorMessages {
     public static final String USER_NOT_FOUND_BY_ID = "User not found with id: ";
     public static final String USER_NOT_FOUND_BY_EMAIL = "User not found with email: ";
     public static final String USER_NOT_FOUND_BY_PHONE = "User not found with phone: ";
+    public static final String PHONE_ALREADY_REGISTERED  = "Phone already registered: ";
+    public static final String EMAIL_ALREADY_REGISTERED = "Email already registered: ";
+    public static final String INVALID_CREDENTIALS = "Invalid email or newPassword";
 
     // Payment errors
     public static final String PAYMENT_NOT_FOUND = "Payment doesn't exist with id: ";
@@ -27,4 +30,18 @@ public class ErrorMessages {
     public static final String WEBHOOK_NOT_FOUND_BY_ID = "Webhook not found with id: ";
     public static final String WEBHOOK_UNHANDLED_SUPPORTED_EVENT = "No handler for supported event type: ";
 
+    // Security errors
+    public static final String TOKEN_REVOKED = "Token has been revoked";
+    public static final String TOKEN_EXPIRED = "Token has expired";
+    public static final String TOKEN_INVALID = "Invalid token";
+    public static final String PAYMENT_ACCESS_DENIED = "You don't have access to this payment";
+
+    // Validation errors
+    public static final String INVALID_PHONE_NUMBER = "Invalid phone number";
+
+    // Verification errors
+    public static final String SMS_CODE_EXPIRED = "SMS code expired for: ";
+    public static final String SMS_CODE_INVALID = "Invalid SMS code for: ";
+    public static final String EMAIL_CODE_EXPIRED = "Email code expired for: ";
+    public static final String EMAIL_CODE_INVALID = "Invalid email code for: ";
 }

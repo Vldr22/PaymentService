@@ -7,6 +7,7 @@ import org.resume.paymentservice.model.dto.CommonResponse;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -26,6 +27,35 @@ public class GlobalExceptionHandler {
     public CommonResponse<Void> handleNotFound(NotFoundException e) {
         log.warn("Resource not found: {}", e.getMessage());
         return errorResponse(HttpStatus.NOT_FOUND, e.getMessage());
+    }
+
+    @ExceptionHandler(AlreadyExistsException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public CommonResponse<Void> handleAlreadyExists(AlreadyExistsException e) {
+        log.warn("Resource already exists: {}", e.getMessage());
+        return errorResponse(HttpStatus.CONFLICT, e.getMessage());
+    }
+
+    @ExceptionHandler(VerificationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public CommonResponse<Void> handleVerification(VerificationException e) {
+        log.warn("Verification failed: {}", e.getMessage());
+        return errorResponse(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
+
+    @ExceptionHandler(AuthException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public CommonResponse<Void> handleAuth(AuthException e) {
+        log.warn("Authentication failed: {}", e.getMessage());
+        return errorResponse(HttpStatus.UNAUTHORIZED, e.getMessage());
+    }
+
+    // ========== SECURITY ==========
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public CommonResponse<Void> handleAccessDenied(AccessDeniedException e) {
+        log.warn("Access denied: {}", e.getMessage());
+        return errorResponse(HttpStatus.FORBIDDEN, e.getMessage());
     }
 
     // ========== WEBHOOK ==========
@@ -96,17 +126,17 @@ public class GlobalExceptionHandler {
     }
 
     // ========== GENERAL ==========
-    @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public CommonResponse<Void> handleGeneral(Exception e) {
-        log.error("Unexpected error", e);
-        return errorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error");
-    }
-
     @ExceptionHandler(IllegalStateException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public CommonResponse<Void> handleIllegalState(IllegalStateException e) {
         log.error("Illegal state: {}", e.getMessage(), e);
+        return errorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error");
+    }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public CommonResponse<Void> handleGeneral(Exception e) {
+        log.error("Unexpected error", e);
         return errorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error");
     }
 
