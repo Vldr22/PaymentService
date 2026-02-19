@@ -50,6 +50,21 @@ public class NotFoundException extends RuntimeException {
         );
     }
 
+    // Refund
+    public static NotFoundException refundById(Long refundId) {
+        return new NotFoundException(
+                String.format("%s%d", ErrorMessages.REFUND_NOT_FOUND, refundId),
+                String.valueOf(refundId)
+        );
+    }
+
+    public static NotFoundException refundByPaymentIntentId(String paymentIntentId) {
+        return new NotFoundException(
+                String.format("%s%s", ErrorMessages.REFUND_NOT_FOUND_BY_PAYMENT_INTENT, paymentIntentId),
+                paymentIntentId
+        );
+    }
+
     // Webhook
     public static NotFoundException webhookEventByID(String eventId) {
         return new NotFoundException(

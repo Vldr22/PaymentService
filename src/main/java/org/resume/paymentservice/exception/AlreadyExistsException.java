@@ -27,5 +27,11 @@ public class AlreadyExistsException extends RuntimeException {
         );
     }
 
+    public static AlreadyExistsException refundByPaymentId(Long paymentId) {
+        return new AlreadyExistsException(
+                String.format("%s%d", ErrorMessages.REFUND_ALREADY_REQUESTED, paymentId),
+                String.valueOf(paymentId)
+        );
+    }
 
 }

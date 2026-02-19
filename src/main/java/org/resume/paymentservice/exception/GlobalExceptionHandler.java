@@ -50,6 +50,14 @@ public class GlobalExceptionHandler {
         return errorResponse(HttpStatus.UNAUTHORIZED, e.getMessage());
     }
 
+    @ExceptionHandler(PaymentException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public CommonResponse<Void> handlePayment(PaymentException e) {
+        log.warn("Payment error: identifier={}, reason={}", e.getIdentifier(), e.getMessage());
+        return errorResponse(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
+
+
     // ========== SECURITY ==========
     @ExceptionHandler(AccessDeniedException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)

@@ -36,4 +36,12 @@ public class StripePaymentException extends RuntimeException {
                 cause
         );
     }
+
+    public static StripePaymentException byRefundError(String stripeMessage, Throwable cause) {
+        return new StripePaymentException(
+                String.format("%s%s", ErrorMessages.STRIPE_REFUND_FAILED, stripeMessage),
+                stripeMessage,
+                cause
+        );
+    }
 }

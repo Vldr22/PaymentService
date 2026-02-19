@@ -5,7 +5,8 @@ public enum PaymentStatus {
     PROCESSING,
     SUCCEEDED,
     FAILED,
-    CANCELED;
+    CANCELED,
+    REFUNDED;
 
     public static PaymentStatus mapStripeStatus(String stripeStatus) {
         return switch (stripeStatus.toLowerCase()) {
