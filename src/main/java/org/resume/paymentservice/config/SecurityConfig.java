@@ -31,6 +31,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/payments/**").hasRole("USER")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/support/**").hasRole("EMPLOYEE")
+                        .requestMatchers("/api/cards/**").hasRole("USER")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);

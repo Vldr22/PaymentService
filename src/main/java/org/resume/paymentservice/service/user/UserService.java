@@ -7,6 +7,7 @@ import org.resume.paymentservice.model.enums.Roles;
 import org.resume.paymentservice.repository.UserRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -48,10 +49,14 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    @Transactional
     public void updateEmployeePassword(String email, String encodedPassword) {
-        User user = getUserByEmail(email);
-        user.setPassword(encodedPassword);
-        userRepository.save(user);
+        userRepository.updatePassword(email, encodedPassword);
+    }
+
+    public void updateStripeCustomerId(User user, String stripeCustomerId) {
+        userRepository.updateStripeCustomerId(user.getId(), stripeCustomerId);
+        user.setStripeCustomerId(stripeCustomerId);
     }
 
     public User getCurrentUser() {

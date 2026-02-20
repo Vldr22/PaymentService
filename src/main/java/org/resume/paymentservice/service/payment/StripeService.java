@@ -1,13 +1,14 @@
 package org.resume.paymentservice.service.payment;
 
 import com.stripe.exception.StripeException;
+import com.stripe.model.Customer;
 import com.stripe.model.PaymentIntent;
+import com.stripe.model.PaymentMethod;
 import com.stripe.model.Refund;
-import com.stripe.param.PaymentIntentConfirmParams;
-import com.stripe.param.PaymentIntentCreateParams;
-import com.stripe.param.RefundCreateParams;
+import com.stripe.param.*;
 import lombok.extern.slf4j.Slf4j;
 import org.resume.paymentservice.exception.StripePaymentException;
+import org.resume.paymentservice.model.dto.data.SavedCardData;
 import org.resume.paymentservice.model.dto.request.CreatePaymentRequest;
 import org.resume.paymentservice.model.dto.response.PaymentResponse;
 import org.resume.paymentservice.model.enums.RefundReason;
@@ -19,14 +20,11 @@ import java.math.BigDecimal;
 @Service
 public class StripeService {
 
-    public PaymentResponse createStripePayment(CreatePaymentRequest request) {
-        log.info("Creating Stripe payment: amount={}, currency={}",
-                request.amount(), request.currency());
-
+    public PaymentResponse createStripePayment(CreatePaymentRequest request, String customerId) {
         try {
             long amountInCents = convertToCents(request.amount());
 
-            PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
+            PaymentIntentCreateParams.Builder builder = PaymentIntentCreateParams.builder()
                     .setAmount(amountInCents)
                     .setCurrency(request.currency().name().toLowerCase())
                     .setDescription(request.description())
@@ -34,10 +32,13 @@ public class StripeService {
                             PaymentIntentCreateParams.AutomaticPaymentMethods.builder()
                                     .setEnabled(true)
                                     .build()
-                    )
-                    .build();
+                    );
 
-            PaymentIntent paymentIntent = PaymentIntent.create(params);
+            if (customerId != null) {
+                builder.setCustomer(customerId);
+            }
+
+            PaymentIntent paymentIntent = PaymentIntent.create(builder.build());
 
             log.info("Payment Stripe has been created: id={}, status={}",
                     paymentIntent.getId(), paymentIntent.getStatus());
@@ -71,6 +72,63 @@ public class StripeService {
         }
     }
 
+    public String createCustomer(String name, String phone) {
+        try {
+            CustomerCreateParams params = CustomerCreateParams.builder()
+                    .setName(name)
+                    .setPhone(phone)
+                    .build();
+
+            Customer customer = Customer.create(params);
+
+            log.info("Stripe Customer created: customerId={}", customer.getId());
+            return customer.getId();
+
+        } catch (StripeException e) {
+            log.error("Failed to create Stripe Customer: {}", e.getMessage(), e);
+            throw StripePaymentException.byCreationError(e.getMessage(), e);
+        }
+    }
+
+    public SavedCardData addPaymentMethod(String customerId, String paymentMethodId) {
+        try {
+            PaymentMethod paymentMethod = PaymentMethod.retrieve(paymentMethodId);
+
+            PaymentMethodAttachParams params = PaymentMethodAttachParams.builder()
+                    .setCustomer(customerId)
+                    .build();
+
+            PaymentMethod attached = paymentMethod.attach(params);
+            PaymentMethod.Card card = attached.getCard();
+
+            log.info("PaymentMethod attached: customerId={}, paymentMethodId={}", customerId, paymentMethodId);
+
+            return new SavedCardData(
+                    attached.getId(),
+                    card.getLast4(),
+                    card.getBrand(),
+                    card.getExpMonth().shortValue(),
+                    card.getExpYear().shortValue()
+            );
+
+        } catch (StripeException e) {
+            log.error("Failed to attach PaymentMethod: {}", e.getMessage(), e);
+            throw StripePaymentException.byCreationError(e.getMessage(), e);
+        }
+    }
+
+    public void removePaymentMethod(String paymentMethodId) {
+        try {
+            PaymentMethod paymentMethod = PaymentMethod.retrieve(paymentMethodId);
+            paymentMethod.detach();
+
+            log.info("PaymentMethod detached: paymentMethodId={}", paymentMethodId);
+
+        } catch (StripeException e) {
+            log.error("Failed to detach PaymentMethod: {}", e.getMessage(), e);
+            throw StripePaymentException.byCreationError(e.getMessage(), e);
+        }
+    }
 
     public PaymentResponse confirmPayment(String paymentIntentId, String paymentMethod, String returnUrl) {
         try {

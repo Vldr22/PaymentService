@@ -30,6 +30,10 @@ public class ErrorMessages {
     public static final String STRIPE_PAYMENT_CONFIRMED_FAILED = "Stripe payment confirmed failed: ";
     public static final String STRIPE_PAYMENT_STATUS_Error = "Failed to get payment status from Stripe: ";
 
+    // Card errors
+    public static final String CARD_NOT_FOUND = "Card not found with id: ";
+    public static final String CARD_ALREADY_ATTACHED = "Card already present: ";
+
     // Webhook errors
     public static final String WEBHOOK_INVALID_SIGNATURE = "Invalid webhook signature for this event: ";
     public static final String WEBHOOK_ALREADY_PROCESSED = "This webhook already was processed: ";

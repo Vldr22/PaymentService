@@ -12,28 +12,42 @@ import java.time.LocalDateTime;
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "card_tokens", indexes = {
-        @Index(name = "idx_user_id", columnList = "user_id")
+@Table(name = "saved_cards", indexes = {
+        @Index(name = "idx_saved_cards_user_id", columnList = "user_id")
 })
-public class CardToken {
+public class SavedCard {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(length = 100, nullable = false, unique = true)
-    private String token;
+    private String stripePaymentMethodId;
 
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    @Column(length = 4, nullable = false)
+    private String last4;
+
+    @Column(length = 20, nullable = false)
+    private String brand;
+
+    @Column(nullable = false)
+    private Short expMonth;
+
+    @Column(nullable = false)
+    private Short expYear;
+
+    @Column(nullable = false)
+    private boolean defaultCard = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
     }
-
 }

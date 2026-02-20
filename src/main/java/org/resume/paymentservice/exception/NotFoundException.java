@@ -58,6 +58,14 @@ public class NotFoundException extends RuntimeException {
         );
     }
 
+    //Card
+    public static NotFoundException cardById(Long id) {
+        return new NotFoundException(
+                String.format("%s%d",  ErrorMessages.CARD_NOT_FOUND, id),
+                String.valueOf(id)
+        );
+    }
+
     public static NotFoundException refundByPaymentIntentId(String paymentIntentId) {
         return new NotFoundException(
                 String.format("%s%s", ErrorMessages.REFUND_NOT_FOUND_BY_PAYMENT_INTENT, paymentIntentId),
