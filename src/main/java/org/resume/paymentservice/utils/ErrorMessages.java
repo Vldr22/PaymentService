@@ -17,6 +17,14 @@ public class ErrorMessages {
     public static final String PAYMENT_NOT_FOUND = "Payment doesn't exist with id: ";
     public static final String PAYMENT_NOT_FOUND_BY_STRIPE_ID = "Payment doesn't exist with Stripe Id: ";
 
+    // Refund errors
+    public static final String PAYMENT_NOT_REFUNDABLE = "Payment cannot be refunded. Current status: ";
+    public static final String REFUND_ALREADY_REQUESTED = "Refund request already exists for payment: ";
+    public static final String REFUND_NOT_FOUND = "Refund not found with id: ";
+    public static final String STRIPE_REFUND_FAILED = "Stripe refund failed for payment: ";
+    public static final String REFUND_NOT_PENDING = "Refund request cannot be processed. Current status: ";
+    public static final String REFUND_NOT_FOUND_BY_PAYMENT_INTENT = "Approved refund not found for payment: ";
+
     // Stripe errors
     public static final String STRIPE_PAYMENT_CREATION_FAILED = "Stripe payment creation failed: ";
     public static final String STRIPE_PAYMENT_CONFIRMED_FAILED = "Stripe payment confirmed failed: ";

@@ -2,12 +2,15 @@ package org.resume.paymentservice.service.payment;
 
 import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
+import com.stripe.model.Refund;
 import com.stripe.param.PaymentIntentConfirmParams;
 import com.stripe.param.PaymentIntentCreateParams;
+import com.stripe.param.RefundCreateParams;
 import lombok.extern.slf4j.Slf4j;
 import org.resume.paymentservice.exception.StripePaymentException;
 import org.resume.paymentservice.model.dto.request.CreatePaymentRequest;
 import org.resume.paymentservice.model.dto.response.PaymentResponse;
+import org.resume.paymentservice.model.enums.RefundReason;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -47,6 +50,28 @@ public class StripeService {
         }
     }
 
+
+    public String createRefund(String paymentIntentId, RefundReason reason) {
+        try {
+            RefundCreateParams params = RefundCreateParams.builder()
+                    .setPaymentIntent(paymentIntentId)
+                    .setReason(mapRefundReason(reason))
+                    .build();
+
+            Refund stripeRefund = Refund.create(params);
+
+            log.info("Stripe refund created: id={}, paymentIntent={}, status={}",
+                    stripeRefund.getId(), paymentIntentId, stripeRefund.getStatus());
+
+            return stripeRefund.getId();
+
+        } catch (StripeException e) {
+            log.error("Stripe refund failed: paymentIntent={}, error={}", paymentIntentId, e.getMessage());
+            throw StripePaymentException.byRefundError(e.getMessage(), e);
+        }
+    }
+
+
     public PaymentResponse confirmPayment(String paymentIntentId, String paymentMethod, String returnUrl) {
         try {
             PaymentIntent paymentIntent = PaymentIntent.retrieve(paymentIntentId);
@@ -80,6 +105,15 @@ public class StripeService {
             log.error("Failed to retrieve Stripe payment status: {}", e.getMessage(), e);
             throw StripePaymentException.byStatusError(e.getMessage(), e);
         }
+    }
+
+
+    private RefundCreateParams.Reason mapRefundReason(RefundReason reason) {
+        return switch (reason) {
+            case DUPLICATE -> RefundCreateParams.Reason.DUPLICATE;
+            case FRAUDULENT -> RefundCreateParams.Reason.FRAUDULENT;
+            case REQUESTED_BY_CUSTOMER -> RefundCreateParams.Reason.REQUESTED_BY_CUSTOMER;
+        };
     }
 
     private PaymentResponse toPaymentResponse(PaymentIntent paymentIntent) {

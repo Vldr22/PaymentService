@@ -5,7 +5,9 @@ import lombok.RequiredArgsConstructor;
 import org.resume.paymentservice.model.dto.CommonResponse;
 import org.resume.paymentservice.model.dto.request.ConfirmPaymentRequest;
 import org.resume.paymentservice.model.dto.request.CreatePaymentRequest;
+import org.resume.paymentservice.model.dto.request.RefundRequest;
 import org.resume.paymentservice.model.dto.response.PaymentResponse;
+import org.resume.paymentservice.model.dto.response.RefundResponse;
 import org.resume.paymentservice.service.facade.PaymentFacadeService;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,6 +33,15 @@ public class PaymentController {
             @Valid @RequestBody ConfirmPaymentRequest request
     ) {
         PaymentResponse response = paymentFacadeService.confirmPayment(paymentIntentId, request);
+        return CommonResponse.success(response);
+    }
+
+    @PostMapping("/{paymentIntentId}/refund")
+    public CommonResponse<RefundResponse> requestRefund(
+            @PathVariable String paymentIntentId,
+            @Valid @RequestBody RefundRequest request
+    ) {
+        RefundResponse response = paymentFacadeService.createRefund(paymentIntentId, request);
         return CommonResponse.success(response);
     }
 

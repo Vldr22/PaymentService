@@ -54,12 +54,13 @@ public class PaymentService {
                 .orElseThrow(() -> NotFoundException.paymentByStripeId(stripePaymentIntentId));
     }
 
-    public void findByStripePaymentIntentIdAndUser(String stripePaymentIntentId, User user) {
+    public Payment findByStripePaymentIntentIdAndUser(String stripePaymentIntentId, User user) {
         Payment payment = findByStripePaymentIntentId(stripePaymentIntentId);
 
         if (!payment.getUser().getId().equals(user.getId())) {
             throw new AccessDeniedException(ErrorMessages.PAYMENT_ACCESS_DENIED);
         }
+        return payment;
     }
 
 }

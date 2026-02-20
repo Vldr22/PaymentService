@@ -6,11 +6,15 @@ import org.resume.paymentservice.exception.StripePaymentException;
 import org.resume.paymentservice.model.dto.PaymentCreationData;
 import org.resume.paymentservice.model.dto.request.ConfirmPaymentRequest;
 import org.resume.paymentservice.model.dto.request.CreatePaymentRequest;
+import org.resume.paymentservice.model.dto.request.RefundRequest;
 import org.resume.paymentservice.model.dto.response.PaymentResponse;
+import org.resume.paymentservice.model.dto.response.RefundResponse;
 import org.resume.paymentservice.model.entity.Payment;
+import org.resume.paymentservice.model.entity.Refund;
 import org.resume.paymentservice.model.entity.User;
 import org.resume.paymentservice.model.enums.PaymentStatus;
 import org.resume.paymentservice.service.payment.PaymentService;
+import org.resume.paymentservice.service.payment.RefundService;
 import org.resume.paymentservice.service.payment.StripeService;
 import org.resume.paymentservice.service.user.UserService;
 import org.springframework.stereotype.Service;
@@ -25,6 +29,7 @@ public class PaymentFacadeService {
     private final PaymentService paymentService;
     private final StripeService stripeService;
     private final UserService userService;
+    private final RefundService refundService;
 
     public PaymentResponse createPayment(CreatePaymentRequest request) {
         User user = userService.getCurrentUser();
@@ -37,6 +42,16 @@ public class PaymentFacadeService {
                 user.getId(), stripeResponse.getId());
 
         return stripeResponse;
+    }
+
+    public RefundResponse createRefund(String paymentIntentId, RefundRequest request) {
+        User currentUser = userService.getCurrentUser();
+        Payment payment = paymentService.findByStripePaymentIntentIdAndUser(paymentIntentId, currentUser);
+
+        Refund refund = refundService.createRefundRequest(payment, currentUser, request.reason());
+
+        log.info("Refund requested: refundId={}, paymentIntentId={}", refund.getId(), paymentIntentId);
+        return toRefundResponse(refund);
     }
 
     public PaymentResponse confirmPayment(String paymentIntentId, ConfirmPaymentRequest request) {
@@ -90,6 +105,16 @@ public class PaymentFacadeService {
                 .description(request.description())
                 .clientSecret(stripeResponse.getClientSecret())
                 .build();
+    }
+
+    private RefundResponse toRefundResponse(Refund refund) {
+        return new RefundResponse(
+                refund.getPayment().getStripePaymentIntentId(),
+                refund.getAmount(),
+                refund.getPayment().getCurrency(),
+                refund.getReason(),
+                refund.getStatus()
+        );
     }
 
 }
