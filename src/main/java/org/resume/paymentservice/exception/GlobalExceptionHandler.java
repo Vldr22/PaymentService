@@ -1,6 +1,6 @@
 package org.resume.paymentservice.exception;
 
-import jakarta.validation.ConstraintViolation;
+
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.resume.paymentservice.model.dto.CommonResponse;
@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import java.util.List;
 import java.util.Objects;
 
 @Slf4j
@@ -86,27 +87,34 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public CommonResponse<Void> handleValidation(MethodArgumentNotValidException e) {
-        String message = e.getBindingResult().getFieldErrors()
+        List<String> errors = e.getBindingResult().getFieldErrors()
                 .stream()
-                .findFirst()
                 .map(error -> error.getField() + ": " + error.getDefaultMessage())
-                .orElse("Validation failed");
+                .toList();
 
-        log.warn("Validation failed: {}", message);
-        return errorResponse(HttpStatus.BAD_REQUEST, message);
+        log.warn("Validation failed: {}", errors);
+
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Validation failed");
+        problemDetail.setProperty("errors", errors);
+        return CommonResponse.error(problemDetail);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public CommonResponse<Void> handleConstraintViolation(ConstraintViolationException e) {
-        String message = e.getConstraintViolations()
+        List<String> errors = e.getConstraintViolations()
                 .stream()
-                .findFirst()
-                .map(ConstraintViolation::getMessage)
-                .orElse("Validation failed");
+                .map(v -> {
+                    String field = v.getPropertyPath().toString();
+                    return field + ": " + v.getMessage();
+                })
+                .toList();
 
-        log.warn("Constraint violation: {}", message);
-        return errorResponse(HttpStatus.BAD_REQUEST, message);
+        log.warn("Constraint violation: {}", errors);
+
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Validation failed");
+        problemDetail.setProperty("errors", errors);
+        return CommonResponse.error(problemDetail);
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
