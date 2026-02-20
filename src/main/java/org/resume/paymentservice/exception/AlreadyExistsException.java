@@ -34,4 +34,11 @@ public class AlreadyExistsException extends RuntimeException {
         );
     }
 
+    public static AlreadyExistsException cardAlreadyPresent(String paymentMethodId) {
+        return new AlreadyExistsException(
+                String.format("%s%s", ErrorMessages.CARD_ALREADY_ATTACHED, paymentMethodId),
+                paymentMethodId
+        );
+    }
+
 }

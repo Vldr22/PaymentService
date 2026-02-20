@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "payments", indexes = {
-        @Index(name = "idx_stripe_payment_intent_id", columnList = "stripePaymentIntentId"),
+        @Index(name = "idx_stripe_payment_intent_id", columnList = "stripe_payment_intent_id"),
         @Index(name = "idx_user_id", columnList = "user_id")
 })
 public class Payment {
@@ -56,8 +56,8 @@ public class Payment {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "card_token_id")
-    private CardToken cardToken;
+    @JoinColumn(name = "saved_card_id")
+    private SavedCard savedCard;
 
     @PrePersist
     protected void onCreate() {
@@ -71,7 +71,7 @@ public class Payment {
 
     public Payment(String stripePaymentIntentId, BigDecimal amount, Currency currency,
                    PaymentStatus status, String description, String clientSecret,
-                   User user, CardToken cardToken) {
+                   User user, SavedCard cardToken) {
         this.stripePaymentIntentId = stripePaymentIntentId;
         this.amount = amount;
         this.currency = currency;
@@ -79,7 +79,7 @@ public class Payment {
         this.description = description;
         this.clientSecret = clientSecret;
         this.user = user;
-        this.cardToken = cardToken;
+        this.savedCard = cardToken;
     }
 
 }

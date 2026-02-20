@@ -57,4 +57,8 @@ public class Subscription {
     @JoinColumn(name = "last_payment_id")
     private Payment lastPayment;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "saved_card_id")
+    private SavedCard savedCard;
+
 }

@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.resume.paymentservice.model.dto.CommonResponse;
 import org.resume.paymentservice.model.dto.request.ConfirmPaymentRequest;
+import org.resume.paymentservice.model.dto.request.ConfirmWithSavedCardRequest;
 import org.resume.paymentservice.model.dto.request.CreatePaymentRequest;
 import org.resume.paymentservice.model.dto.request.RefundRequest;
 import org.resume.paymentservice.model.dto.response.PaymentResponse;
@@ -33,6 +34,15 @@ public class PaymentController {
             @Valid @RequestBody ConfirmPaymentRequest request
     ) {
         PaymentResponse response = paymentFacadeService.confirmPayment(paymentIntentId, request);
+        return CommonResponse.success(response);
+    }
+
+    @PostMapping("/{paymentIntentId}/confirm/saved-card")
+    public CommonResponse<PaymentResponse> confirmPaymentWithSavedCard(
+            @PathVariable String paymentIntentId,
+            @Valid @RequestBody ConfirmWithSavedCardRequest request
+    ) {
+        PaymentResponse response = paymentFacadeService.confirmPaymentWithSavedCard(paymentIntentId, request);
         return CommonResponse.success(response);
     }
 

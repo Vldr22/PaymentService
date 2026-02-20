@@ -3,16 +3,19 @@ package org.resume.paymentservice.service.facade;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.resume.paymentservice.exception.StripePaymentException;
-import org.resume.paymentservice.model.dto.PaymentCreationData;
+import org.resume.paymentservice.model.dto.data.PaymentCreationData;
 import org.resume.paymentservice.model.dto.request.ConfirmPaymentRequest;
+import org.resume.paymentservice.model.dto.request.ConfirmWithSavedCardRequest;
 import org.resume.paymentservice.model.dto.request.CreatePaymentRequest;
 import org.resume.paymentservice.model.dto.request.RefundRequest;
 import org.resume.paymentservice.model.dto.response.PaymentResponse;
 import org.resume.paymentservice.model.dto.response.RefundResponse;
 import org.resume.paymentservice.model.entity.Payment;
 import org.resume.paymentservice.model.entity.Refund;
+import org.resume.paymentservice.model.entity.SavedCard;
 import org.resume.paymentservice.model.entity.User;
 import org.resume.paymentservice.model.enums.PaymentStatus;
+import org.resume.paymentservice.service.card.SavedCardService;
 import org.resume.paymentservice.service.payment.PaymentService;
 import org.resume.paymentservice.service.payment.RefundService;
 import org.resume.paymentservice.service.payment.StripeService;
@@ -30,10 +33,13 @@ public class PaymentFacadeService {
     private final StripeService stripeService;
     private final UserService userService;
     private final RefundService refundService;
+    private final SavedCardService savedCardService;
 
     public PaymentResponse createPayment(CreatePaymentRequest request) {
         User user = userService.getCurrentUser();
-        PaymentResponse stripeResponse = stripeService.createStripePayment(request);
+        PaymentResponse stripeResponse = stripeService.createStripePayment(
+                request, user.getStripeCustomerId()
+        );
 
         PaymentCreationData data = buildPaymentCreationData(user.getId(), request, stripeResponse);
         paymentService.savePayment(data);
@@ -71,6 +77,31 @@ public class PaymentFacadeService {
         } catch (StripePaymentException e) {
             paymentService.updatePaymentStatus(paymentIntentId, PaymentStatus.FAILED);
             log.warn("Payment confirmation failed, marked as FAILED: paymentIntentId={}", paymentIntentId);
+            throw e;
+        }
+    }
+
+    public PaymentResponse confirmPaymentWithSavedCard(String paymentIntentId, ConfirmWithSavedCardRequest request) {
+        User user = userService.getCurrentUser();
+        validatePaymentOwner(paymentIntentId);
+
+        SavedCard card = savedCardService.getCardByIdAndUser(request.savedCardId(), user);
+
+        try {
+            PaymentResponse response = stripeService.confirmPayment(
+                    paymentIntentId, card.getStripePaymentMethodId(), request.returnUrl()
+            );
+
+            PaymentStatus newStatus = PaymentStatus.mapStripeStatus(response.getStatus());
+            paymentService.updatePaymentStatus(paymentIntentId, newStatus);
+
+            log.info("Payment confirmed with saved card: paymentIntentId={}, cardId={}",
+                    paymentIntentId, request.savedCardId());
+            return response;
+
+        } catch (StripePaymentException e) {
+            paymentService.updatePaymentStatus(paymentIntentId, PaymentStatus.FAILED);
+            log.warn("Payment confirmation failed: paymentIntentId={}", paymentIntentId);
             throw e;
         }
     }

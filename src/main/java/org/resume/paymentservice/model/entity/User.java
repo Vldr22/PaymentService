@@ -48,6 +48,9 @@ public class User {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(length = 100, unique = true)
+    private String stripeCustomerId;
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();

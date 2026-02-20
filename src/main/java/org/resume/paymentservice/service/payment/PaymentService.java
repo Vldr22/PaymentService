@@ -4,7 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.resume.paymentservice.exception.NotFoundException;
-import org.resume.paymentservice.model.dto.PaymentCreationData;
+import org.resume.paymentservice.model.dto.data.PaymentCreationData;
 import org.resume.paymentservice.model.entity.Payment;
 import org.resume.paymentservice.model.entity.User;
 import org.resume.paymentservice.model.enums.PaymentStatus;

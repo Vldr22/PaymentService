@@ -1,4 +1,4 @@
-package org.resume.paymentservice.model.dto;
+package org.resume.paymentservice.model.dto.data;
 
 import lombok.Builder;
 import lombok.Getter;
