@@ -83,7 +83,7 @@ public class PaymentFacadeService {
 
     public PaymentResponse confirmPaymentWithSavedCard(String paymentIntentId, ConfirmWithSavedCardRequest request) {
         User user = userService.getCurrentUser();
-        validatePaymentOwner(paymentIntentId);
+        paymentService.findByStripePaymentIntentIdAndUser(paymentIntentId, user);
 
         SavedCard card = savedCardService.getCardByIdAndUser(request.savedCardId(), user);
 
@@ -107,11 +107,9 @@ public class PaymentFacadeService {
     }
 
     public PaymentResponse getPaymentStatus(String paymentIntentId) {
-        validatePaymentOwner(paymentIntentId);
+        Payment payment = validatePaymentOwner(paymentIntentId);
 
         PaymentResponse stripeResponse = stripeService.getPaymentStatus(paymentIntentId);
-
-        Payment payment = paymentService.findByStripePaymentIntentId(paymentIntentId);
         PaymentStatus newStatus = mapStripeStatus(stripeResponse.getStatus());
 
         if (!payment.getStatus().equals(newStatus)) {
@@ -121,9 +119,9 @@ public class PaymentFacadeService {
         return stripeResponse;
     }
 
-    private void validatePaymentOwner(String paymentIntentId) {
+    private Payment validatePaymentOwner(String paymentIntentId) {
         User currentUser = userService.getCurrentUser();
-        paymentService.findByStripePaymentIntentIdAndUser(paymentIntentId, currentUser);
+        return paymentService.findByStripePaymentIntentIdAndUser(paymentIntentId, currentUser);
     }
 
     private PaymentCreationData buildPaymentCreationData(Long userId, CreatePaymentRequest request,
