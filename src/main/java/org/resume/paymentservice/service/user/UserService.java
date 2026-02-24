@@ -1,13 +1,12 @@
 package org.resume.paymentservice.service.user;
 
 import lombok.RequiredArgsConstructor;
+import org.resume.paymentservice.exception.AlreadyExistsException;
 import org.resume.paymentservice.exception.NotFoundException;
 import org.resume.paymentservice.model.entity.User;
-import org.resume.paymentservice.model.enums.Roles;
 import org.resume.paymentservice.repository.UserRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,33 +24,16 @@ public class UserService {
                 .orElseThrow(() -> NotFoundException.userByPhone(phone));
     }
 
-    public User getUserByEmail(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> NotFoundException.userByEmail(email));
-    }
-
     public boolean existsByPhone(String phone) {
         return userRepository.existsByPhone(phone);
     }
 
-    public boolean existsByEmail(String email) {
-        return userRepository.existsByEmail(email);
-    }
-
     public User createClient(String name, String surname, String midname, String phone) {
+        if (userRepository.existsByPhone(phone)) {
+            throw AlreadyExistsException.userByPhone(phone);
+        }
         User user = new User(name, surname, midname, phone);
         return userRepository.save(user);
-    }
-
-    public User createEmployee(String name, String surname, String midname,
-                               String email, String encodedPassword, Roles role) {
-        User user = new User(name, surname, midname, email, encodedPassword, role);
-        return userRepository.save(user);
-    }
-
-    @Transactional
-    public void updateEmployeePassword(String email, String encodedPassword) {
-        userRepository.updatePassword(email, encodedPassword);
     }
 
     public void updateStripeCustomerId(User user, String stripeCustomerId) {
@@ -60,12 +42,9 @@ public class UserService {
     }
 
     public User getCurrentUser() {
-        String subject = SecurityContextHolder.getContext()
+        String phone = SecurityContextHolder.getContext()
                 .getAuthentication()
                 .getName();
-
-        return userRepository.findByPhone(subject)
-                .or(() -> userRepository.findByEmail(subject))
-                .orElseThrow(() -> NotFoundException.userByPhone(subject));
+        return getUserByPhone(phone);
     }
 }

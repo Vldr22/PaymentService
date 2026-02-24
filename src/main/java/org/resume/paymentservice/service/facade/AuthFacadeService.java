@@ -7,13 +7,15 @@ import org.resume.paymentservice.model.dto.request.*;
 import org.resume.paymentservice.model.dto.response.ClientResponse;
 import org.resume.paymentservice.model.dto.response.EmployeeResponse;
 import org.resume.paymentservice.model.dto.response.TokenResponse;
+import org.resume.paymentservice.model.entity.Staff;
 import org.resume.paymentservice.model.entity.User;
 import org.resume.paymentservice.security.JwtBlacklistService;
 import org.resume.paymentservice.security.JwtCookeService;
 import org.resume.paymentservice.security.JwtService;
-import org.resume.paymentservice.service.auth.AuthService;
-import org.resume.paymentservice.service.auth.VerificationCodeService;
+import org.resume.paymentservice.service.verification.VerificationCodeService;
+import org.resume.paymentservice.service.user.StaffService;
 import org.resume.paymentservice.service.user.UserService;
+import org.resume.paymentservice.utils.CodeGenerator;
 import org.resume.paymentservice.utils.PhoneUtils;
 import org.springframework.stereotype.Service;
 
@@ -22,8 +24,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuthFacadeService {
 
-    private final AuthService authService;
     private final UserService userService;
+    private final StaffService staffService;
     private final JwtService jwtService;
     private final JwtCookeService jwtCookeService;
     private final JwtBlacklistService jwtBlacklistService;
@@ -31,7 +33,8 @@ public class AuthFacadeService {
 
     // ========== CLIENT ==============
     public ClientResponse registerClient(ClientRegistrationRequest request) {
-        User user = authService.registerClient(request);
+        String normalizedPhone = PhoneUtils.normalize(request.phone());
+        User user = createClient(request, normalizedPhone);
         log.info("Client registered: phone={}", user.getPhone());
         return toClientResponse(user);
     }
@@ -48,7 +51,7 @@ public class AuthFacadeService {
         verificationCodeService.verifyCode(normalizedPhone, request.code());
 
         User user = userService.getUserByPhone(normalizedPhone);
-        TokenResponse tokenResponse = generateTokenAndSetCookie(normalizedPhone, user, response);
+        TokenResponse tokenResponse = generateUserTokenAndSetCookie(normalizedPhone, user, response);
 
         log.info("Client logged in: phone={}", normalizedPhone);
         return tokenResponse;
@@ -56,27 +59,31 @@ public class AuthFacadeService {
 
     // ========== ADMIN ==============
     public EmployeeResponse createEmployee(EmployeeRegistrationRequest request) {
-        User user = authService.createEmployee(request);
-        log.info("Employee created with TempPassword: name={}, email={}, role={}",
-                user.getName(), user.getEmail(), user.getRole());
-        return toEmployeeResponse(user);
+        String tempPassword = CodeGenerator.generatePassword();
+        Staff staff = createStaff(request, tempPassword);
+        log.info("Employee created: email={}, tempPassword={}", staff.getEmail(), tempPassword);
+        return toStaffResponse(staff);
     }
 
-    // ========== Employee ===========
-    public void updatePassword(UpdatePasswordRequest request) {
-        authService.validateEmployeeCredentials(request.email(), request.oldPassword());
-        authService.updatePassword(request.email(), request.newPassword());
-        log.info("Employee verify and change password success with email={}", request.email());
-    }
-
+    // ========== STAFF ==============
     public TokenResponse verifyAndLoginWithEmail(SupportLoginRequest request, HttpServletResponse response) {
-        authService.validateEmployeeCredentials(request.email(), request.password());
-
-        User user = userService.getUserByEmail(request.email());
-        TokenResponse tokenResponse = generateTokenAndSetCookie(request.email(), user, response);
-
-        log.info("Employee logged in: email={}, role={}", request.email(), user.getRole());
+        Staff staff = staffService.validateCredentials(request.email(), request.password());
+        TokenResponse tokenResponse = generateStaffTokenAndSetCookie(request.email(), staff, response);
+        log.info("Staff logged in: email={}, role={}", staff.getEmail(), staff.getRole());
         return tokenResponse;
+    }
+
+    public void setInitialPassword(SetInitialPasswordRequest request) {
+        staffService.validatePassword(request.email(), request.tempPassword());
+        staffService.setInitialPassword(request.email(), request.newPassword());
+        log.info("Initial password set: email={}", request.email());
+    }
+
+    public void changePassword(ChangePasswordRequest request) {
+        Staff staff = staffService.getCurrentStaff();
+        staffService.validatePassword(staff.getEmail(), request.oldPassword());
+        staffService.changePassword(staff.getEmail(), request.newPassword());
+        log.info("Password changed: email={}", staff.getEmail());
     }
 
     // ========== LOGOUT ==============
@@ -91,8 +98,14 @@ public class AuthFacadeService {
     }
 
     // ========== HELPERS METHOD ==============
-    private TokenResponse generateTokenAndSetCookie(String subject, User user, HttpServletResponse response) {
+    private TokenResponse generateUserTokenAndSetCookie(String subject, User user, HttpServletResponse response) {
         String token = jwtService.generateToken(subject, user.getRole());
+        jwtCookeService.setAuthCookie(response, token);
+        return new TokenResponse(token);
+    }
+
+    private TokenResponse generateStaffTokenAndSetCookie(String subject, Staff staff, HttpServletResponse response) {
+        String token = jwtService.generateToken(subject, staff.getRole());
         jwtCookeService.setAuthCookie(response, token);
         return new TokenResponse(token);
     }
@@ -102,18 +115,33 @@ public class AuthFacadeService {
                 user.getName(),
                 user.getSurname(),
                 user.getPhone(),
-                user.getUserStatus()
-        );
+                user.getUserStatus());
     }
 
-    private EmployeeResponse toEmployeeResponse(User user) {
+    private EmployeeResponse toStaffResponse(Staff staff) {
         return new EmployeeResponse(
-                user.getName(),
-                user.getSurname(),
-                user.getEmail(),
-                user.getRole(),
-                user.getUserStatus()
-        );
+                staff.getName(),
+                staff.getSurname(),
+                staff.getEmail(),
+                staff.getRole(),
+                staff.getUserStatus());
+    }
+
+    private User createClient(ClientRegistrationRequest request, String normalizedPhone) {
+        return userService.createClient(
+                request.name(),
+                request.surname(),
+                request.midname(),
+                normalizedPhone);
+    }
+
+    private Staff createStaff(EmployeeRegistrationRequest request, String tempPassword) {
+        return staffService.createEmployee(
+                request.name(),
+                request.surname(),
+                request.midname(),
+                request.email(),
+                tempPassword);
     }
 
 }

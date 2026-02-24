@@ -47,15 +47,15 @@ public class AuthController {
     }
 
     // ======== SUPPORT ========
-    @PutMapping("/email/update-password")
-    public CommonResponse<String> updatePassword(
-            @Valid @RequestBody UpdatePasswordRequest request
+    @PatchMapping("/staff/set-password")
+    public CommonResponse<String> setInitialPassword(
+            @Valid @RequestBody SetInitialPasswordRequest request
     ) {
-        authFacadeService.updatePassword(request);
+        authFacadeService.setInitialPassword(request);
         return CommonResponse.success(SuccessMessages.UPDATE_PASSWORD_SUCCESS);
     }
 
-    @PostMapping("/email/login")
+    @PostMapping("/staff/login")
     public CommonResponse<TokenResponse> loginByEmail(
             @Valid @RequestBody SupportLoginRequest request,
             HttpServletResponse response

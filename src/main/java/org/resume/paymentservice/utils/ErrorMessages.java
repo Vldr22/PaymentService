@@ -11,7 +11,7 @@ public class ErrorMessages {
     public static final String USER_NOT_FOUND_BY_PHONE = "User not found with phone: ";
     public static final String PHONE_ALREADY_REGISTERED  = "Phone already registered: ";
     public static final String EMAIL_ALREADY_REGISTERED = "Email already registered: ";
-    public static final String INVALID_CREDENTIALS = "Invalid email or newPassword";
+    public static final String INVALID_CREDENTIALS = "Invalid email or password";
 
     // Payment errors
     public static final String PAYMENT_NOT_FOUND = "Payment doesn't exist with id: ";
@@ -47,6 +47,7 @@ public class ErrorMessages {
     public static final String TOKEN_EXPIRED = "Token has expired";
     public static final String TOKEN_INVALID = "Invalid token";
     public static final String PAYMENT_ACCESS_DENIED = "You don't have access to this payment";
+    public static final String PASSWORD_CHANGE_REQUIRED = "Password change required before login";
 
     // Validation errors
     public static final String INVALID_PHONE_NUMBER = "Invalid phone number";

@@ -54,7 +54,7 @@ public class Refund {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reviewed_by")
-    private User reviewedBy;
+    private Staff reviewedBy;
 
     @Column
     private LocalDateTime updatedAt;

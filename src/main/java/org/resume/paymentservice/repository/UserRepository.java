@@ -12,17 +12,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByPhone(String phone);
 
-    Optional<User> findByEmail(String email);
-
     boolean existsByPhone(String phone);
-
-    boolean existsByEmail(String email);
 
     @Modifying
     @Query("UPDATE User u SET u.stripeCustomerId = :customerId WHERE u.id = :id")
     void updateStripeCustomerId(@Param("id") Long id, @Param("customerId") String customerId);
 
-    @Modifying
-    @Query("UPDATE User u SET u.password = :password WHERE u.email = :email")
-    void updatePassword(@Param("email") String email, @Param("password") String password);
 }

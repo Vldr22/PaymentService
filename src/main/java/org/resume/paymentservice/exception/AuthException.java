@@ -10,4 +10,8 @@ public class AuthException extends RuntimeException {
     public static AuthException invalidCredentials() {
         return new AuthException(ErrorMessages.INVALID_CREDENTIALS);
     }
+
+    public static AuthException passwordChangeRequired() {
+        return new AuthException(ErrorMessages.PASSWORD_CHANGE_REQUIRED);
+    }
 }

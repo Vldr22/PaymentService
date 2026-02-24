@@ -21,7 +21,7 @@ public class NotFoundException extends RuntimeException {
         );
     }
 
-    public static NotFoundException userByEmail(String email) {
+    public static NotFoundException staffByEmail(String email) {
         return new NotFoundException(
                 String.format("%s%s", ErrorMessages.USER_NOT_FOUND_BY_EMAIL, email),
                 email

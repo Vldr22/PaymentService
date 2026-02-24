@@ -20,7 +20,7 @@ public class AlreadyExistsException extends RuntimeException {
         );
     }
 
-    public static AlreadyExistsException employeeByEmail(String email) {
+    public static AlreadyExistsException staffByEmail(String email) {
         return new AlreadyExistsException(
                 String.format("%s%s", ErrorMessages.EMAIL_ALREADY_REGISTERED, email),
                 email
