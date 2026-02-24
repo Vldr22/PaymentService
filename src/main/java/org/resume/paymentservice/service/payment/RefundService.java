@@ -7,6 +7,7 @@ import org.resume.paymentservice.exception.NotFoundException;
 import org.resume.paymentservice.exception.PaymentException;
 import org.resume.paymentservice.model.entity.Payment;
 import org.resume.paymentservice.model.entity.Refund;
+import org.resume.paymentservice.model.entity.Staff;
 import org.resume.paymentservice.model.entity.User;
 import org.resume.paymentservice.model.enums.PaymentStatus;
 import org.resume.paymentservice.model.enums.RefundReason;
@@ -46,7 +47,7 @@ public class RefundService {
     }
 
 
-    public void approveRefund(Refund refund, User reviewer, String stripeRefundId) {
+    public void approveRefund(Refund refund, Staff reviewer, String stripeRefundId) {
         refund.setStatus(RefundStatus.APPROVED);
         refund.setStripeRefundId(stripeRefundId);
         refund.setReviewedBy(reviewer);
@@ -55,7 +56,7 @@ public class RefundService {
         log.info("Refund approved: id={}, reviewedBy={}", refund.getId(), reviewer.getEmail());
     }
 
-    public void rejectRefund(Refund refund, User reviewer) {
+    public void rejectRefund(Refund refund, Staff reviewer) {
         refund.setStatus(RefundStatus.REJECTED);
         refund.setReviewedBy(reviewer);
         refundRepository.save(refund);

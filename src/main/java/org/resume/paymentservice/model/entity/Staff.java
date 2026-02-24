@@ -1,7 +1,10 @@
 package org.resume.paymentservice.model.entity;
 
+
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.resume.paymentservice.model.enums.Roles;
 import org.resume.paymentservice.model.enums.UserStatus;
 
@@ -10,9 +13,8 @@ import java.time.LocalDateTime;
 @Entity
 @Getter @Setter
 @NoArgsConstructor
-@AllArgsConstructor
-@Table(name = "users")
-public class User {
+@Table(name = "staff")
+public class Staff {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,34 +29,41 @@ public class User {
     @Column(length = 50)
     private String midname;
 
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private UserStatus userStatus = UserStatus.ACTIVE;
+    @Column(nullable = false, unique = true)
+    private String email;
 
-    @Column(length = 20, unique = true)
-    private String phone;
+    @Column(nullable = false)
+    private String password;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Roles role;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private UserStatus userStatus = UserStatus.ACTIVE;
+
+    @Column(nullable = false)
+    private boolean passwordChangeRequired;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
-
-    @Column(length = 100, unique = true)
-    private String stripeCustomerId;
 
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
     }
 
-    public User(String name, String surname, String midname, String phone) {
+    public Staff(String name, String surname, String midname,
+                 String email, String password, Roles role,
+                 boolean passwordChangeRequired) {
         this.name = name;
         this.surname = surname;
         this.midname = midname;
-        this.phone = phone;
-        this.role = Roles.ROLE_USER;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+        this.passwordChangeRequired = passwordChangeRequired;
     }
 
 }
