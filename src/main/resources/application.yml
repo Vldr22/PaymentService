@@ -51,4 +51,15 @@ admin:
   email: ${ADMIN.EMAIL}
   password: ${ADMIN.PASSWORD}
 
+billing:
+  cron: "*/30 * * * * *"
+  max-retry-count: 3
+  retry-interval-days: 1
+  interval-days: 1
+  basic-amount: 9.99
+  premium-amount: 19.99
+  default-currency: USD
+
+
+
 

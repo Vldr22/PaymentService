@@ -33,6 +33,7 @@ public class ErrorMessages {
     // Card errors
     public static final String CARD_NOT_FOUND = "Card not found with id: ";
     public static final String CARD_ALREADY_ATTACHED = "Card already present: ";
+    public static final String CARD_LINKED_TO_ACTIVE_SUBSCRIPTION = "Card is linked to active subscription: ";
 
     // Webhook errors
     public static final String WEBHOOK_INVALID_SIGNATURE = "Invalid webhook signature for this event: ";
@@ -40,7 +41,6 @@ public class ErrorMessages {
     public static final String WEBHOOK_PROCESSING_FAILED = "Failed webhook event: ";
     public static final String WEBHOOK_DESERIALIZATION_FAILED = "Can't deserialize PaymentIntent from event: ";
     public static final String WEBHOOK_NOT_FOUND_BY_ID = "Webhook not found with id: ";
-    public static final String WEBHOOK_UNHANDLED_SUPPORTED_EVENT = "No handler for supported event type: ";
 
     // Security errors
     public static final String TOKEN_REVOKED = "Token has been revoked";
@@ -57,4 +57,12 @@ public class ErrorMessages {
     public static final String SMS_CODE_INVALID = "Invalid SMS code for: ";
     public static final String EMAIL_CODE_EXPIRED = "Email code expired for: ";
     public static final String EMAIL_CODE_INVALID = "Invalid email code for: ";
+
+    // Subscription errors
+    public static final String SUBSCRIPTION_NOT_FOUND_BY_ID = "Subscription not found with id: ";
+    public static final String SUBSCRIPTION_NOT_FOUND_BY_USER_ID = "Subscription not found for userId: ";
+    public static final String SUBSCRIPTION_ALREADY_EXISTS = "Subscription already exists for userId: ";
+
+    // Billing errors
+    public static final String BILLING_NOT_FOUND_BY_PAYMENT_INTENT = "Billing attempt not found for paymentIntentId: ";
 }

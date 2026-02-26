@@ -1,4 +1,4 @@
-package org.resume.paymentservice.service.webhook;
+package org.resume.paymentservice.service.webhook.signature;
 
 import com.stripe.model.Event;
 
