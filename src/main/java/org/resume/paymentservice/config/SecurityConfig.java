@@ -29,10 +29,11 @@ public class SecurityConfig {
                         .requestMatchers("/api/webhooks/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/api/payments/**").hasRole("USER")
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/support/**").hasRole("EMPLOYEE")
                         .requestMatchers("/api/cards/**").hasRole("USER")
+                        .requestMatchers("/api/subscriptions/**").hasRole("USER")
+                        .requestMatchers("/api/support/**").hasRole("EMPLOYEE")
                         .requestMatchers("/api/staff/**").hasAnyRole("EMPLOYEE", "ADMIN")
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
