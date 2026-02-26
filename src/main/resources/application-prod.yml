@@ -1,0 +1,25 @@
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+
+  jpa:
+    show-sql: false
+
+stripe:
+  webhook:
+    dev-mode: prod
+
+jwt:
+  cookie-secure: true
+
+billing:
+  cron: "0 0 9 * * *"
+  interval-days: 30
+  retry-interval-days: 3

@@ -1,0 +1,25 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/payment_service
+    username: postgres
+    password: ${POSTGRES_PASSWORD}
+
+  data:
+    redis:
+      host: localhost
+      port: 6380
+
+  jpa:
+    show-sql: true
+
+stripe:
+  webhook:
+    dev-mode: prod
+
+jwt:
+  cookie-secure: false
+
+billing:
+  cron: "*/30 * * * * *"
+  interval-days: 1
+  retry-interval-days: 1
