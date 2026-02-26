@@ -7,10 +7,12 @@ import com.stripe.model.PaymentMethod;
 import com.stripe.model.Refund;
 import com.stripe.param.*;
 import lombok.extern.slf4j.Slf4j;
+import org.resume.paymentservice.contants.BillingConstants;
 import org.resume.paymentservice.exception.StripePaymentException;
 import org.resume.paymentservice.model.dto.data.SavedCardData;
 import org.resume.paymentservice.model.dto.request.CreatePaymentRequest;
 import org.resume.paymentservice.model.dto.response.PaymentResponse;
+import org.resume.paymentservice.model.enums.Currency;
 import org.resume.paymentservice.model.enums.RefundReason;
 import org.springframework.stereotype.Service;
 
@@ -69,6 +71,38 @@ public class StripeService {
         } catch (StripeException e) {
             log.error("Stripe refund failed: paymentIntent={}, error={}", paymentIntentId, e.getMessage());
             throw StripePaymentException.byRefundError(e.getMessage(), e);
+        }
+    }
+
+    public PaymentIntent chargeWithSavedCard(BigDecimal amount, Currency currency,
+                                             String customerId, String paymentMethodId,
+                                             String description, Long subscriptionId) {
+        try {
+            long amountInCents = convertToCents(amount);
+
+            PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
+                    .setAmount(amountInCents)
+                    .setCurrency(currency.name().toLowerCase())
+                    .setCustomer(customerId)
+                    .setPaymentMethod(paymentMethodId)
+                    .setDescription(description)
+                    .setConfirm(true)
+                    .setOffSession(true)
+                    .putMetadata(BillingConstants.METADATA_KEY_TYPE, BillingConstants.METADATA_TYPE_BILLING)
+                    .putMetadata(BillingConstants.METADATA_KEY_SUBSCRIPTION_ID, subscriptionId.toString())
+                    .build();
+
+            PaymentIntent paymentIntent = PaymentIntent.create(params);
+
+            log.info("Billing charge created: stripePaymentIntentId={}, customerId={}, subscriptionId={}, status={}",
+                    paymentIntent.getId(), customerId, subscriptionId, paymentIntent.getStatus());
+
+            return paymentIntent;
+
+        } catch (StripeException e) {
+            log.error("Billing charge failed: customerId={}, subscriptionId={}, error={}",
+                    customerId, subscriptionId, e.getMessage());
+            throw StripePaymentException.byCreationError(e.getMessage(), e);
         }
     }
 
@@ -165,7 +199,7 @@ public class StripeService {
         }
     }
 
-
+    // Helpers Methods
     private RefundCreateParams.Reason mapRefundReason(RefundReason reason) {
         return switch (reason) {
             case DUPLICATE -> RefundCreateParams.Reason.DUPLICATE;

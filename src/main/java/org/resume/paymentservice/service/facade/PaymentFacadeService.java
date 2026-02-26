@@ -94,6 +94,7 @@ public class PaymentFacadeService {
 
             PaymentStatus newStatus = PaymentStatus.mapStripeStatus(response.getStatus());
             paymentService.updatePaymentStatus(paymentIntentId, newStatus);
+            paymentService.updateSavedCard(paymentIntentId, card);
 
             log.info("Payment confirmed with saved card: paymentIntentId={}, cardId={}",
                     paymentIntentId, request.savedCardId());
