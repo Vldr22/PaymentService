@@ -1,19 +1,22 @@
 package org.resume.paymentservice.model.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.resume.paymentservice.model.enums.Currency;
+import org.resume.paymentservice.model.enums.SubscriptionStatus;
 import org.resume.paymentservice.model.enums.SubscriptionType;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
 @Getter @Setter
 @NoArgsConstructor
-@AllArgsConstructor
-@Table(name = "subscriptions")
+@Table(name = "subscriptions", indexes = {
+        @Index(name = "idx_subscriptions_billing", columnList = "next_billing_date, subscription_status")
+})
 public class Subscription {
 
     @Id
@@ -24,11 +27,31 @@ public class Subscription {
     @Column(length = 50, nullable = false)
     private SubscriptionType subscriptionType;
 
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20, nullable = false)
+    private SubscriptionStatus subscriptionStatus = SubscriptionStatus.ACTIVE;
+
+    @Column(nullable = false, precision = 15, scale = 2)
+    private BigDecimal amount;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 10, nullable = false)
+    private Currency currency;
+
+    @Column(nullable = false)
+    private Integer intervalDays;
+
     @Column(nullable = false)
     private LocalDateTime startDate;
 
     @Column(nullable = false)
     private LocalDateTime endDate;
+
+    @Column(nullable = false)
+    private LocalDateTime nextBillingDate;
+
+    @Column(nullable = false)
+    private Integer retryCount = 0;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -36,8 +59,17 @@ public class Subscription {
     @Column
     private LocalDateTime updatedAt;
 
-    @Column(nullable = false)
-    private boolean active;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "saved_card_id", nullable = false)
+    private SavedCard savedCard;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "last_payment_id")
+    private Payment lastPayment;
 
     @PrePersist
     protected void onCreate() {
@@ -49,16 +81,35 @@ public class Subscription {
         updatedAt = LocalDateTime.now();
     }
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    public Subscription(User user, SavedCard savedCard, SubscriptionType type,
+                        BigDecimal amount, Currency currency, int intervalDays) {
+        this.user = user;
+        this.savedCard = savedCard;
+        this.subscriptionType = type;
+        this.amount = amount;
+        this.currency = currency;
+        this.intervalDays = intervalDays;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "last_payment_id")
-    private Payment lastPayment;
+        LocalDateTime now = LocalDateTime.now();
+        this.startDate = now;
+        this.endDate = now.plusDays(intervalDays);
+        this.nextBillingDate = now.plusDays(intervalDays);
+    }
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "saved_card_id")
-    private SavedCard savedCard;
+    public Subscription(User user, SavedCard savedCard, SubscriptionType type,
+                        BigDecimal amount, Currency currency, int intervalDays,
+                        LocalDateTime nextBillingDate) {
+        this.user = user;
+        this.savedCard = savedCard;
+        this.subscriptionType = type;
+        this.amount = amount;
+        this.currency = currency;
+        this.intervalDays = intervalDays;
+
+        LocalDateTime now = LocalDateTime.now();
+        this.startDate = now;
+        this.endDate = now.plusDays(intervalDays);
+        this.nextBillingDate = nextBillingDate;
+    }
 
 }
