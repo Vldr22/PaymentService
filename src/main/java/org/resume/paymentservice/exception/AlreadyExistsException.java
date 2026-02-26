@@ -41,4 +41,18 @@ public class AlreadyExistsException extends RuntimeException {
         );
     }
 
+    public static AlreadyExistsException subscriptionByUserId(Long userId) {
+        return new AlreadyExistsException(
+                String.format("%s%d", ErrorMessages.SUBSCRIPTION_ALREADY_EXISTS, userId),
+                String.valueOf(userId)
+        );
+    }
+
+    public static AlreadyExistsException cardLinkedToActiveSubscription(Long cardId) {
+        return new AlreadyExistsException(
+                String.format("%s%d", ErrorMessages.CARD_LINKED_TO_ACTIVE_SUBSCRIPTION, cardId),
+                String.valueOf(cardId)
+        );
+    }
+
 }

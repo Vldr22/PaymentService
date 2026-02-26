@@ -6,13 +6,11 @@ import org.redisson.api.RedissonClient;
 import org.redisson.client.codec.StringCodec;
 import org.redisson.config.Config;
 import org.resume.paymentservice.properties.RedisProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @RequiredArgsConstructor
-@EnableConfigurationProperties(RedisProperties.class)
 public class RedissonConfig {
 
     private final RedisProperties redisProperties;

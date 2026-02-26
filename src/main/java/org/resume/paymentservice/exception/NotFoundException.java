@@ -80,4 +80,27 @@ public class NotFoundException extends RuntimeException {
                 eventId
         );
     }
+
+    // Subscription
+    public static NotFoundException subscriptionById(Long id) {
+        return new NotFoundException(
+                String.format("%s%d", ErrorMessages.SUBSCRIPTION_NOT_FOUND_BY_ID, id),
+                String.valueOf(id)
+        );
+    }
+
+    public static NotFoundException subscriptionByUserId(Long userId) {
+        return new NotFoundException(
+                String.format("%s%d", ErrorMessages.SUBSCRIPTION_NOT_FOUND_BY_USER_ID, userId),
+                String.valueOf(userId)
+        );
+    }
+
+    // Billing
+    public static NotFoundException billingAttemptByPaymentIntentId(String paymentIntentId) {
+        return new NotFoundException(
+                String.format("%s%s", ErrorMessages.BILLING_NOT_FOUND_BY_PAYMENT_INTENT, paymentIntentId),
+                paymentIntentId
+        );
+    }
 }

@@ -9,6 +9,7 @@ import org.resume.paymentservice.model.entity.SavedCard;
 import org.resume.paymentservice.model.entity.User;
 import org.resume.paymentservice.repository.SavedCardRepository;
 import org.resume.paymentservice.service.payment.StripeService;
+import org.resume.paymentservice.service.subscription.SubscriptionService;
 import org.resume.paymentservice.service.user.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,7 @@ public class SavedCardService {
     private final SavedCardRepository savedCardRepository;
     private final UserService userService;
     private final StripeService stripeService;
+    private final SubscriptionService subscriptionService;
 
     @Transactional
     public SavedCard addCard(User user, String paymentMethodId) {
@@ -46,9 +48,13 @@ public class SavedCardService {
     @Transactional
     public void removeCard(User user, Long cardId) {
         SavedCard card = getCardByIdAndUser(cardId, user);
+
+        if (subscriptionService.hasActiveSubscriptionByCard(cardId)) {
+            throw AlreadyExistsException.cardLinkedToActiveSubscription(cardId);
+        }
+
         stripeService.removePaymentMethod(card.getStripePaymentMethodId());
         savedCardRepository.delete(card);
-
         log.info("Card removed: userId={}, cardId={}", user.getId(), cardId);
     }
 
