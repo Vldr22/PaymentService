@@ -9,6 +9,9 @@ public class SecurityConstants {
     public static final String COOKIE_NAME = "auth_token";
     public static final String CLAIM_ROLE = "role";
 
+    public static final String MSG_UNAUTHORIZED = "Authentication required";
+    public static final String MSG_ACCESS_DENIED = "Access denied";
+
     public static final String[] PUBLIC_PATHS = {
             "/api/auth/",
             "/api/webhooks/",
