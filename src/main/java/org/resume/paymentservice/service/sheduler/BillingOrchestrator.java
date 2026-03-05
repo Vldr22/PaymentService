@@ -10,7 +10,6 @@ import org.resume.paymentservice.service.payment.StripeService;
 import org.resume.paymentservice.service.subscription.BillingAttemptService;
 import org.resume.paymentservice.service.subscription.SubscriptionService;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -22,7 +21,6 @@ public class BillingOrchestrator {
     private final StripeService stripeService;
     private final PaymentService paymentService;
 
-    @Transactional
     public void processSubscription(Subscription subscription) {
         log.info("Processing subscription: id={}, userId={}",
                 subscription.getId(), subscription.getUser().getId());
@@ -40,9 +38,9 @@ public class BillingOrchestrator {
                     subscription.getId()
             );
 
-            paymentService.saveBillingPayment(paymentIntent, subscription);
             attempt.setStripePaymentIntentId(paymentIntent.getId());
             billingAttemptService.save(attempt);
+            paymentService.saveBillingPayment(paymentIntent, subscription);
 
             log.info("Charge initiated: subscriptionId={}, attemptId={}",
                     subscription.getId(), attempt.getId());
