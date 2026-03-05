@@ -45,3 +45,8 @@ billing:
   basic-amount: 9.99
   premium-amount: 19.99
   default-currency: USD
+
+springdoc:
+  swagger-ui:
+    display-request-duration: true
+    try-it-out-enabled: true

@@ -74,12 +74,17 @@ public class SubscriptionFacadeService {
     }
 
     private BillingAttemptResponse toBillingAttemptResponse(BillingAttempt attempt) {
+        Subscription subscription = attempt.getSubscription();
         return new BillingAttemptResponse(
                 attempt.getAttemptNumber(),
                 attempt.getStatus(),
                 attempt.getErrorMessage(),
+                subscription.getAmount(),
+                subscription.getCurrency(),
+                subscription.getSubscriptionType(),
                 attempt.getScheduledAt(),
-                attempt.getExecutedAt()
+                attempt.getExecutedAt(),
+                subscription.getEndDate()
         );
     }
 
