@@ -40,13 +40,13 @@ public interface WebhookEventHandler {
         throw WebhookProcessingException.byDeserializationFailed(event.getId());
     }
 
-    default String extractRefundId(Event event) {
+    default String extractRefundPaymentIntentIdFromRefund(Event event) {
         Object obj = event.getDataObjectDeserializer()
                 .getObject()
                 .orElseThrow(() -> WebhookProcessingException.byDeserializationFailed(event.getId()));
 
         if (obj instanceof com.stripe.model.Refund refund) {
-            return refund.getId();
+            return refund.getPaymentIntent();
         }
 
         throw WebhookProcessingException.byDeserializationFailed(event.getId());

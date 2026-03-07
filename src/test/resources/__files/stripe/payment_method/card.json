@@ -1,0 +1,11 @@
+{
+  "id": "pm_test_001",
+  "object": "payment_method",
+  "type": "card",
+  "card": {
+    "brand": "visa",
+    "last4": "4242",
+    "exp_month": 12,
+    "exp_year": 2027
+  }
+}

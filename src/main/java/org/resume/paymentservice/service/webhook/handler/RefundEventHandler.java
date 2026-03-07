@@ -22,9 +22,9 @@ public class RefundEventHandler {
         paymentService.updatePaymentStatus(paymentIntentId, PaymentStatus.REFUNDED);
     }
 
-    public void handleRefundFailed(String stripeRefundId) {
-        log.warn("Processing refund failed event: {}", stripeRefundId);
-        refundService.updateRefundStatusByPaymentIntentId(stripeRefundId, RefundStatus.FAILED);
+    public void handleRefundFailed(String paymentIntentId) {
+        log.warn("Processing refund failed event: {}", paymentIntentId);
+        refundService.updateRefundStatusByPaymentIntentId(paymentIntentId, RefundStatus.FAILED);
     }
 
 }

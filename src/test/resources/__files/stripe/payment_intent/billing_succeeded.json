@@ -1,0 +1,13 @@
+{
+  "id": "pi_billing_001",
+  "object": "payment_intent",
+  "amount": 999,
+  "currency": "usd",
+  "status": "succeeded",
+  "client_secret": "pi_billing_001_secret",
+  "description": "BASIC",
+  "metadata": {
+    "type": "billing",
+    "subscriptionId": "1"
+  }
+}

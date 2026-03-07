@@ -11,10 +11,9 @@ public class RefundFailedHandler implements WebhookEventHandler {
 
    private final RefundEventHandler refundEventHandler;
 
-    @Override
     public void handle(Event event) {
-        String refundId = extractRefundId(event);
-        refundEventHandler.handleRefundFailed(refundId);
+        String paymentIntentId = extractRefundPaymentIntentIdFromRefund(event);
+        refundEventHandler.handleRefundFailed(paymentIntentId);
     }
 
     @Override

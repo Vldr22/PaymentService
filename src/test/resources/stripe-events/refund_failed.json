@@ -1,0 +1,24 @@
+{
+  "id": "evt_3T7ocORqnwyBFap61Ubr2XdC",
+  "object": "event",
+  "api_version": "2026-01-28.clover",
+  "created": 1772676349,
+  "data": {
+    "object": {
+      "id": "re_test_failed_001",
+      "object": "refund",
+      "amount": 1999,
+      "currency": "usd",
+      "payment_intent": "pi_3T7PULRqnwyBFap61fkmmSCw",
+      "status": "failed",
+      "failure_reason": "expired_or_canceled_card"
+    }
+  },
+  "livemode": false,
+  "pending_webhooks": 1,
+  "request": {
+    "id": "req_refund_failed_001",
+    "idempotency_key": "refund-failed-test-001"
+  },
+  "type": "refund.failed"
+}

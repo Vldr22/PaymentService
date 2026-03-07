@@ -1,0 +1,6 @@
+{
+  "id": "cus_test_001",
+  "object": "customer",
+  "name": "Иван Иванов",
+  "phone": "+79001234567"
+}

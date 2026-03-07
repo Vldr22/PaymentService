@@ -1,0 +1,4 @@
+#!/bin/bash
+
+echo "Starting Stripe listener..."
+stripe listen --forward-to localhost:8080/api/webhooks/stripe &

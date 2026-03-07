@@ -24,10 +24,6 @@ public class UserService {
                 .orElseThrow(() -> NotFoundException.userByPhone(phone));
     }
 
-    public boolean existsByPhone(String phone) {
-        return userRepository.existsByPhone(phone);
-    }
-
     public User createClient(String name, String surname, String midname, String phone) {
         if (userRepository.existsByPhone(phone)) {
             throw AlreadyExistsException.userByPhone(phone);
