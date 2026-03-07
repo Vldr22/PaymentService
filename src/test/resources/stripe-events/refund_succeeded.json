@@ -1,0 +1,135 @@
+{
+  "id": "evt_3T7PVnRqnwyBFap60OeEgPWD",
+  "object": "event",
+  "api_version": "2026-01-28.clover",
+  "created": 1772676349,
+  "data": {
+    "object": {
+      "id": "ch_3T7PVnRqnwyBFap604IPiqM1",
+      "object": "charge",
+      "amount": 1999,
+      "amount_captured": 1999,
+      "amount_refunded": 1999,
+      "application": null,
+      "application_fee": null,
+      "application_fee_amount": null,
+      "balance_transaction": "txn_3T7PVnRqnwyBFap60yhVk2cl",
+      "billing_details": {
+        "address": {
+          "city": null,
+          "country": null,
+          "line1": null,
+          "line2": null,
+          "postal_code": null,
+          "state": null
+        },
+        "email": null,
+        "name": null,
+        "phone": null,
+        "tax_id": null
+      },
+      "calculated_statement_descriptor": "Stripe",
+      "captured": true,
+      "created": 1772669491,
+      "currency": "usd",
+      "customer": "cus_U5aa57P36m2j7c",
+      "description": "PREMIUM",
+      "destination": null,
+      "dispute": null,
+      "disputed": false,
+      "failure_balance_transaction": null,
+      "failure_code": null,
+      "failure_message": null,
+      "fraud_details": {},
+      "livemode": false,
+      "metadata": {
+        "subscriptionId": "7",
+        "type": "billing"
+      },
+      "on_behalf_of": null,
+      "order": null,
+      "outcome": {
+        "advice_code": null,
+        "network_advice_code": null,
+        "network_decline_code": null,
+        "network_status": "approved_by_network",
+        "reason": null,
+        "risk_level": "normal",
+        "risk_score": 16,
+        "seller_message": "Payment complete.",
+        "type": "authorized"
+      },
+      "paid": true,
+      "payment_intent": "pi_3T7PULRqnwyBFap61fkmmSCw",
+      "payment_method": "pm_1T7POwRqnwyBFap6oR4O2g2j",
+      "payment_method_details": {
+        "card": {
+          "amount_authorized": 1999,
+          "authorization_code": "297681",
+          "brand": "visa",
+          "checks": {
+            "address_line1_check": null,
+            "address_postal_code_check": null,
+            "cvc_check": null
+          },
+          "country": "US",
+          "exp_month": 3,
+          "exp_year": 2027,
+          "extended_authorization": {
+            "status": "disabled"
+          },
+          "fingerprint": "pStvnJDwW6Tk5Tec",
+          "funding": "credit",
+          "incremental_authorization": {
+            "status": "unavailable"
+          },
+          "installments": null,
+          "last4": "4242",
+          "mandate": null,
+          "multicapture": {
+            "status": "unavailable"
+          },
+          "network": "visa",
+          "network_token": {
+            "used": false
+          },
+          "network_transaction_id": "112831161181107",
+          "overcapture": {
+            "maximum_amount_capturable": 1999,
+            "status": "unavailable"
+          },
+          "regulated_status": "unregulated",
+          "three_d_secure": null,
+          "wallet": null
+        },
+        "type": "card"
+      },
+      "radar_options": {},
+      "receipt_email": null,
+      "receipt_number": null,
+      "receipt_url": "https://pay.stripe.com/receipts/payment/CAcaFwoVYWNjdF8xU3lxTGZScW53eUJGYXA2KP3Jo80GMgaSI5Le1Jk6LBZGQMn9lvSIEgf1e-PjKuTcL1rDhqpUcWQkaY3uoUsl16G10E6tc8Y0SXYY",
+      "refunded": true,
+      "review": null,
+      "shipping": null,
+      "source": null,
+      "source_transfer": null,
+      "statement_descriptor": null,
+      "statement_descriptor_suffix": null,
+      "status": "succeeded",
+      "transfer_data": null,
+      "transfer_group": null
+    },
+    "previous_attributes": {
+      "amount_refunded": 0,
+      "receipt_url": "https://pay.stripe.com/receipts/payment/CAcaFwoVYWNjdF8xU3lxTGZScW53eUJGYXA2KP3Jo80GMga3a3Fu1k86LBasgGsfkANWdb4U65M1np7CRMmtdh1f-EIlDwnOtx4URXeaAii2kBv_K3_D",
+      "refunded": false
+    }
+  },
+  "livemode": false,
+  "pending_webhooks": 2,
+  "request": {
+    "id": "req_OsvXtV2B9MalmS",
+    "idempotency_key": "f5c62414-bfec-4560-89fd-86118aa068ba"
+  },
+  "type": "charge.refunded"
+}

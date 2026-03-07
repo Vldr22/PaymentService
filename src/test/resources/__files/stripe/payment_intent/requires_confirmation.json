@@ -1,0 +1,9 @@
+{
+  "id": "pi_test_001",
+  "object": "payment_intent",
+  "amount": 999,
+  "currency": "usd",
+  "status": "requires_confirmation",
+  "client_secret": "pi_test_001_secret",
+  "description": "Test payment"
+}

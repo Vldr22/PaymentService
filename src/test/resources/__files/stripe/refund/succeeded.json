@@ -1,0 +1,8 @@
+{
+  "id": "re_test_001",
+  "object": "refund",
+  "amount": 999,
+  "currency": "usd",
+  "payment_intent": "pi_test_001",
+  "status": "succeeded"
+}
