@@ -92,24 +92,7 @@ public class Subscription {
 
         LocalDateTime now = LocalDateTime.now();
         this.startDate = now;
-        this.endDate = now.plusDays(intervalDays);
-        this.nextBillingDate = now.plusDays(intervalDays);
+        this.endDate = now;
+        this.nextBillingDate = now;
     }
-
-    public Subscription(User user, SavedCard savedCard, SubscriptionType type,
-                        BigDecimal amount, Currency currency, int intervalDays,
-                        LocalDateTime nextBillingDate) {
-        this.user = user;
-        this.savedCard = savedCard;
-        this.subscriptionType = type;
-        this.amount = amount;
-        this.currency = currency;
-        this.intervalDays = intervalDays;
-
-        LocalDateTime now = LocalDateTime.now();
-        this.startDate = now;
-        this.endDate = now.plusDays(intervalDays);
-        this.nextBillingDate = nextBillingDate;
-    }
-
 }
