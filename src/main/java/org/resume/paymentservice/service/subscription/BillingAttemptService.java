@@ -9,6 +9,7 @@ import org.resume.paymentservice.model.entity.Subscription;
 import org.resume.paymentservice.model.enums.BillingAttemptStatus;
 import org.resume.paymentservice.repository.BillingAttemptRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,6 +21,7 @@ public class BillingAttemptService {
 
     private final BillingAttemptRepository billingAttemptRepository;
 
+    @Transactional
     public BillingAttempt createPending(Subscription subscription, int attemptNumber) {
         BillingAttempt attempt = new BillingAttempt(subscription, attemptNumber);
         BillingAttempt saved = billingAttemptRepository.save(attempt);
@@ -29,6 +31,7 @@ public class BillingAttemptService {
         return saved;
     }
 
+    @Transactional
     public void markSucceeded(BillingAttempt attempt, Payment payment, String stripePaymentIntentId) {
         attempt.setStatus(BillingAttemptStatus.SUCCEEDED);
         attempt.setPayment(payment);
@@ -40,6 +43,7 @@ public class BillingAttemptService {
                 attempt.getId(), stripePaymentIntentId);
     }
 
+    @Transactional
     public void markFailed(BillingAttempt attempt, String errorMessage) {
         attempt.setStatus(BillingAttemptStatus.FAILED);
         attempt.setErrorMessage(errorMessage);
@@ -49,15 +53,18 @@ public class BillingAttemptService {
         log.warn("BillingAttempt failed: id={}", attempt.getId());
     }
 
+    @Transactional(readOnly = true)
     public BillingAttempt findByStripePaymentIntentId(String stripePaymentIntentId) {
         return billingAttemptRepository.findByStripePaymentIntentId(stripePaymentIntentId)
                 .orElseThrow(() -> NotFoundException.billingAttemptByPaymentIntentId(stripePaymentIntentId));
     }
 
+    @Transactional(readOnly = true)
     public List<BillingAttempt> findAllBySubscriptionId(Long subscriptionId) {
         return billingAttemptRepository.findAllBySubscriptionId(subscriptionId);
     }
 
+    @Transactional
     public void save(BillingAttempt attempt) {
         billingAttemptRepository.save(attempt);
     }

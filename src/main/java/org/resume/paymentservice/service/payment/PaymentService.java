@@ -1,7 +1,7 @@
 package org.resume.paymentservice.service.payment;
 
 import com.stripe.model.PaymentIntent;
-import jakarta.transaction.Transactional;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.resume.paymentservice.contants.BillingConstants;
@@ -17,6 +17,7 @@ import org.resume.paymentservice.service.user.UserService;
 import org.resume.paymentservice.utils.ErrorMessages;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
