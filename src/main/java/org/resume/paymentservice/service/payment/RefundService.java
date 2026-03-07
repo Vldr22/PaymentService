@@ -14,6 +14,7 @@ import org.resume.paymentservice.model.enums.RefundReason;
 import org.resume.paymentservice.model.enums.RefundStatus;
 import org.resume.paymentservice.repository.RefundRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -24,6 +25,7 @@ public class RefundService {
 
     private final RefundRepository refundRepository;
 
+    @Transactional
     public Refund createRefundRequest(Payment payment, User user, RefundReason reason) {
         validateRefundable(payment);
         validateNoDuplicateRequest(payment);

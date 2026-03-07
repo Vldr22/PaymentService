@@ -41,6 +41,7 @@ public class BillingOrchestrator {
             attempt.setStripePaymentIntentId(paymentIntent.getId());
             billingAttemptService.save(attempt);
             paymentService.saveBillingPayment(paymentIntent, subscription);
+            subscriptionService.markProcessing(subscription);
 
             log.info("Charge initiated: subscriptionId={}, attemptId={}",
                     subscription.getId(), attempt.getId());

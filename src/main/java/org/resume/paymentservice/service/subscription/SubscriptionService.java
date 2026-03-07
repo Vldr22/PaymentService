@@ -14,6 +14,7 @@ import org.resume.paymentservice.model.enums.SubscriptionType;
 import org.resume.paymentservice.properties.BillingProperties;
 import org.resume.paymentservice.repository.SubscriptionRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -28,6 +29,7 @@ public class SubscriptionService {
     private final BillingProperties billingProperties;
     private final SubscriptionRepository subscriptionRepository;
 
+    @Transactional
     public Subscription create(User user, SavedCard savedCard, SubscriptionType type) {
         Optional<Subscription> existing = subscriptionRepository.findByUserId(user.getId());
 
@@ -38,16 +40,19 @@ public class SubscriptionService {
         return createNewSubscription(user, savedCard, type);
     }
 
+    @Transactional(readOnly = true)
     public Subscription findById(Long id) {
         return subscriptionRepository.findById(id)
                 .orElseThrow(() -> NotFoundException.subscriptionById(id));
     }
 
+    @Transactional(readOnly = true)
     public Subscription findByUserId(Long userId) {
         return subscriptionRepository.findByUserIdAndSubscriptionStatusNot(userId, SubscriptionStatus.CANCELLED)
                 .orElseThrow(() -> NotFoundException.subscriptionByUserId(userId));
     }
 
+    @Transactional(readOnly = true)
     public List<Subscription> findDueSubscriptions() {
         return subscriptionRepository.findDueSubscriptions(
                 LocalDateTime.now(),
@@ -55,6 +60,7 @@ public class SubscriptionService {
         );
     }
 
+    @Transactional
     public void markSucceeded(Subscription subscription, Payment payment) {
         LocalDateTime now = LocalDateTime.now();
         subscription.setLastPayment(payment);
@@ -68,6 +74,7 @@ public class SubscriptionService {
                 subscription.getId(), subscription.getNextBillingDate());
     }
 
+    @Transactional
     public void markFailed(Subscription subscription) {
         int newRetryCount = subscription.getRetryCount() + 1;
         subscription.setRetryCount(newRetryCount);
@@ -86,12 +93,21 @@ public class SubscriptionService {
         subscriptionRepository.save(subscription);
     }
 
+    @Transactional
+    public void markProcessing(Subscription subscription) {
+        subscription.setSubscriptionStatus(SubscriptionStatus.PROCESSING);
+        subscriptionRepository.save(subscription);
+        log.info("Subscription marked PROCESSING: id={}", subscription.getId());
+    }
+
+    @Transactional
     public void cancel(Subscription subscription) {
         subscription.setSubscriptionStatus(SubscriptionStatus.CANCELLED);
         subscriptionRepository.save(subscription);
         log.info("Subscription cancelled: id={}", subscription.getId());
     }
 
+    @Transactional(readOnly = true)
     public boolean hasActiveSubscriptionByCard(Long cardId) {
         return subscriptionRepository.existsBySavedCardIdAndSubscriptionStatusIn(
                 cardId,
@@ -121,6 +137,7 @@ public class SubscriptionService {
     }
 
     private Subscription createNewSubscription(User user, SavedCard savedCard, SubscriptionType type) {
+        LocalDateTime now = LocalDateTime.now();
 
         Subscription subscription = new Subscription(
                 user, savedCard, type,
@@ -130,6 +147,8 @@ public class SubscriptionService {
         );
 
         subscription.setSubscriptionStatus(SubscriptionStatus.PAST_DUE);
+        subscription.setNextBillingDate(now);
+        subscription.setEndDate(now.plusDays(billingProperties.getIntervalDays()));
 
         Subscription saved = subscriptionRepository.save(subscription);
         log.info("Subscription created: id={}, userId={}, type={}",
