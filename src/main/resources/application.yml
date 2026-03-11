@@ -2,9 +2,6 @@ spring:
   application:
     name: payment-service
 
-  config:
-    import: optional:file:.env[.properties]
-
   profiles:
     active: dev
 
@@ -25,20 +22,20 @@ server:
   port: 8080
 
 stripe:
-  secret-key: ${STRIPE.SECRET.KEY}
-  publishable-key: ${STRIPE.PUBLISHABLE.KEY}
-  webhook-secret: ${STRIPE.WEBHOOK.SECRET}
+  secret-key: ${STRIPE_SECRET_KEY}
+  publishable-key: ${STRIPE_PUBLISHABLE_KEY}
+  webhook-secret: ${STRIPE_WEBHOOK_SECRET}
 
 jwt:
-  secret-key: ${JWT.TOKEN.SECRET.KEY}
+  secret-key: ${JWT_SECRET_KEY}
   expiration-seconds: 86400
 
 admin:
-  name: ${ADMIN.NAME}
-  midname: ${ADMIN.MIDNAME}
-  surname: ${ADMIN.SURNAME}
-  email: ${ADMIN.EMAIL}
-  password: ${ADMIN.PASSWORD}
+  name: ${ADMIN_NAME}
+  midname: ${ADMIN_MIDNAME}
+  surname: ${ADMIN_SURNAME}
+  email: ${ADMIN_EMAIL}
+  password: ${ADMIN_PASSWORD}
 
 billing:
   max-retry-count: 3
