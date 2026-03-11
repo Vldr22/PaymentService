@@ -67,7 +67,7 @@
 git clone https://github.com/Vldr22/payment-service.git
 cd payment-service
 cp .env.example .env  # заполнить переменные окружения
-./mvnw spring-boot:run
+docker compose up --build
 ```
 
 **Swagger UI:** http://localhost:8080/swagger-ui/index.html
@@ -79,8 +79,9 @@ cp .env.example .env  # заполнить переменные окружени
 
 ## Roadmap
 
-- [ ] Docker Compose
+- [X] Docker Compose
 - [ ] Расширенное управление для администратора: фильтрация платежей, подписок, пользователей
 - [ ] Email уведомления о статусе платежей и подписок
 - [ ] Prometheus + Grafana мониторинг метрик платежей
 - [ ] Полнотекстовый поиск и аналитика по платежам
+- [ ] CORS настройка при добавлении фронтенда и Nginx
